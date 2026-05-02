@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tokyo Night Silent Storm — Preview</title>
+  <style>
+    /* ── Palette variables ─────────────────────────────────────── */
+    :root {
+      --bg-chrome:      #22253a;
+      --bg-panel:       #2a2d3e;
+      --bg-caret-row:   #303450;
+      --bg-selection:   #2d4f67;
+      --bg-razor:       #363b54;
+      --bg-card:        #2a2d3e;
+
+      --fg:             #c0caf5;
+      --fg-dim:         #565f89;
+      --fg-line-num:    #3b3f5c;
+      --fg-line-active: #737aa2;
+
+      --accent:         #7aa2f7;
+      --accent-light:   #7dcfff;
+
+      --keyword:        #bb9af7;
+      --func:           #7aa2f7;
+      --string:         #9ece6a;
+      --number:         #ff9e64;
+      --type:           #2ac3de;
+      --enum:           #73daca;
+      --comment:        #565f89;
+      --operator:       #89ddff;
+      --param:          #e0af68;
+      --escape:         #89ddff;
+      --entity:         #ff9e64;
+      --tag:            #f7768e;
+      --attr:           #7dcfff;
+      --json-key:       #7dcfff;
+      --yaml-key:       #7dcfff;
+      --error:          #f7768e;
+      --warning:        #e0af68;
+
+      --inlay-fg:       #414868;
+      --inlay-bg:       #22253a;
+    }
+
+    /* ── Reset / base ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-chrome);
+      color: var(--fg);
+      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    h1 { font-size: 18px; font-weight: 600; margin-bottom: 4px; color: var(--fg); font-family: system-ui, sans-serif; }
+    h2 { font-size: 11px; font-weight: 400; color: var(--fg-dim); margin-bottom: 20px; font-family: system-ui, sans-serif; }
+    h3 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em;
+         color: var(--fg-dim); margin-bottom: 8px; font-family: system-ui, sans-serif; }
+
+    /* ── IDE chrome mock ──────────────────────────────────────── */
+    .ide-mock {
+      background: var(--bg-chrome);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      border: 1px solid #1a1d2e;
+    }
+
+    .ide-toolbar {
+      background: var(--bg-chrome);
+      height: 38px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 8px;
+      border-bottom: 1px solid #1a1d2e;
+    }
+    .ide-toolbar-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+    }
+    .ide-toolbar-dot:nth-child(1) { background: #f7768e; }
+    .ide-toolbar-dot:nth-child(2) { background: #e0af68; }
+    .ide-toolbar-dot:nth-child(3) { background: #9ece6a; }
+    .ide-toolbar-title {
+      flex: 1; text-align: center; color: var(--fg-dim); font-size: 12px;
+      font-family: system-ui, sans-serif;
+    }
+
+    .ide-tab-bar {
+      background: var(--bg-panel);
+      display: flex;
+      align-items: stretch;
+      border-bottom: 1px solid #1a1d2e;
+      height: 32px;
+    }
+    .ide-tab {
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      color: var(--fg-dim);
+      border-right: 1px solid #1a1d2e;
+      cursor: default;
+      font-family: system-ui, sans-serif;
+    }
+    .ide-tab.active {
+      color: var(--fg);
+      border-bottom: 2px solid var(--accent);
+      margin-bottom: -1px;
+    }
+
+    .ide-body {
+      display: flex;
+      height: 200px;
+    }
+    .ide-sidebar {
+      background: var(--bg-chrome);
+      width: 200px;
+      border-right: 1px solid #1a1d2e;
+      padding: 8px;
+      font-size: 12px;
+      font-family: system-ui, sans-serif;
+    }
+    .ide-sidebar-item { padding: 3px 6px; color: var(--fg-dim); border-radius: 4px; }
+    .ide-sidebar-item.active { color: var(--fg); background: var(--bg-selection); }
+    .ide-sidebar-item.modified { color: var(--accent-light); }
+    .ide-sidebar-item.new { color: var(--string); }
+    .ide-sidebar-item.deleted { color: var(--error); text-decoration: line-through; }
+
+    .ide-editor {
+      flex: 1;
+      background: var(--bg-panel);
+      padding: 10px 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .ide-code-line {
+      display: flex;
+      align-items: baseline;
+      padding: 0 12px;
+      white-space: pre;
+    }
+    .ide-code-line.caret { background: var(--bg-caret-row); }
+    .ide-code-line.selected { background: var(--bg-selection); }
+    .line-num {
+      width: 28px;
+      text-align: right;
+      margin-right: 16px;
+      color: var(--fg-line-num);
+      user-select: none;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    .ide-code-line.caret .line-num { color: var(--fg-line-active); }
+
+    .ide-status {
+      background: var(--bg-chrome);
+      height: 22px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 16px;
+      font-size: 11px;
+      color: var(--fg-dim);
+      border-top: 1px solid #1a1d2e;
+      font-family: system-ui, sans-serif;
+    }
+    .ide-status-accent { color: var(--accent); }
+
+    /* ── Palette swatch row ──────────────────────────────────────── */
+    .swatches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .swatch {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-family: system-ui, sans-serif;
+      color: var(--fg-dim);
+    }
+    .swatch-dot {
+      width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0;
+    }
+
+    /* ── Code cards ───────────────────────────────────────────── */
+    .card {
+      background: var(--bg-card);
+      border-radius: 6px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      border: 1px solid #1f2235;
+    }
+    .card-header {
+      background: var(--bg-chrome);
+      padding: 6px 14px;
+      font-size: 11px;
+      color: var(--fg-dim);
+      border-bottom: 1px solid #1f2235;
+      font-family: system-ui, sans-serif;
+      display: flex;
+      justify-content: space-between;
+    }
+    .card-body { padding: 14px; overflow-x: auto; }
+    pre { margin: 0; white-space: pre; }
+
+    /* ── Inlay hint ───────────────────────────────────────────── */
+    .inlay {
+      display: inline-block;
+      background: var(--inlay-bg);
+      color: var(--inlay-fg);
+      border-radius: 3px;
+      padding: 0 4px;
+      font-size: 11px;
+      vertical-align: baseline;
+      line-height: 1.4;
+    }
+
+    /* ── Syntax token classes ──────────────────────────────────── */
+    .kw  { color: var(--keyword); font-style: italic; }
+    .fn  { color: var(--func); }
+    .str { color: var(--string); }
+    .num { color: var(--number); }
+    .typ { color: var(--type); }
+    .enu { color: var(--enum); }
+    .cmt { color: var(--comment); font-style: italic; }
+    .op  { color: var(--operator); }
+    .prm { color: var(--param); }
+    .esc { color: var(--escape); }
+    .ent { color: var(--entity); }
+    .tag { color: var(--tag); }
+    .att { color: var(--attr); }
+    .ns  { color: var(--fg); }
+    .del { color: var(--keyword); font-style: italic; }
+    .ev  { color: var(--param); font-weight: 600; }
+    .ext { color: var(--func); font-style: italic; }
+    .tp  { color: var(--type); font-style: italic; }
+    .mut { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--fg-dim); }
+    .fst { color: var(--param); }
+    .stc { color: var(--type); font-style: italic; }
+    .err { color: var(--error); text-decoration: wavy underline; text-decoration-color: var(--error); }
+  </style>
+</head>
+<body>
+
+<h1>Tokyo Night Silent Storm</h1>
+<h2>Rider theme preview — open this file in a browser</h2>
+
+<!-- ── IDE mock ──────────────────────────────────────────────── -->
+<div class="ide-mock">
+  <div class="ide-toolbar">
+    <div class="ide-toolbar-dot"></div>
+    <div class="ide-toolbar-dot"></div>
+    <div class="ide-toolbar-dot"></div>
+    <div class="ide-toolbar-title">Rider — MyProject</div>
+  </div>
+  <div class="ide-tab-bar">
+    <div class="ide-tab active">OrderService.cs</div>
+    <div class="ide-tab">appsettings.json</div>
+    <div class="ide-tab">_Layout.cshtml</div>
+  </div>
+  <div class="ide-body">
+    <div class="ide-sidebar">
+      <div class="ide-sidebar-item">📁 MyProject</div>
+      <div class="ide-sidebar-item active">  OrderService.cs</div>
+      <div class="ide-sidebar-item modified">  UserRepository.cs</div>
+      <div class="ide-sidebar-item new">  PaymentGateway.cs</div>
+      <div class="ide-sidebar-item deleted">  LegacyHelper.cs</div>
+      <div class="ide-sidebar-item">📁 Models</div>
+      <div class="ide-sidebar-item">  Order.cs</div>
+    </div>
+    <div class="ide-editor">
+      <div class="ide-code-line">
+        <span class="line-num">1</span>
+        <span><span class="kw">namespace</span> <span class="ns">MyProject.Services</span><span class="op">;</span></span>
+      </div>
+      <div class="ide-code-line">
+        <span class="line-num">2</span>
+        <span></span>
+      </div>
+      <div class="ide-code-line caret">
+        <span class="line-num">3</span>
+        <span><span class="kw">public class</span> <span class="typ">OrderService</span></span>
+      </div>
+      <div class="ide-code-line">
+        <span class="line-num">4</span>
+        <span><span class="op">{</span></span>
+      </div>
+      <div class="ide-code-line">
+        <span class="line-num">5</span>
+        <span>    <span class="kw">private readonly</span> <span class="typ">ILogger</span><span class="op">&lt;</span><span class="typ">OrderService</span><span class="op">&gt;</span> <span class="fn">_logger</span><span class="op">;</span></span>
+      </div>
+      <div class="ide-code-line selected">
+        <span class="line-num">6</span>
+        <span>    <span class="cmt">// selection example</span></span>
+      </div>
+    </div>
+  </div>
+  <div class="ide-status">
+    <span class="ide-status-accent">main</span>
+    <span>UTF-8</span>
+    <span>C#</span>
+    <span>Ln 3, Col 14</span>
+    <span style="margin-left:auto">Tokyo Night Silent Storm</span>
+  </div>
+</div>
+
+<!-- ── Palette ───────────────────────────────────────────────── -->
+<h3>Palette</h3>
+<div class="swatches">
+  <div class="swatch"><div class="swatch-dot" style="background:#bb9af7"></div>keyword #bb9af7</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#7aa2f7"></div>function #7aa2f7</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#9ece6a"></div>string #9ece6a</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#ff9e64"></div>number #ff9e64</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#2ac3de"></div>type #2ac3de</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#73daca"></div>enum/struct #73daca</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#89ddff"></div>operator #89ddff</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#e0af68"></div>param/event #e0af68</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#565f89"></div>comment #565f89</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#c0caf5"></div>fg #c0caf5</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#f7768e"></div>error #f7768e</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#7dcfff"></div>attr/link #7dcfff</div>
+</div>
+
+<!-- ── C# ────────────────────────────────────────────────────── -->
+<div class="card">
+  <div class="card-header"><span>C# — ReSharper semantic tokens</span><span>OrderService.cs</span></div>
+  <div class="card-body"><pre>
+<span class="kw">using</span> <span class="ns">System</span><span class="op">.</span><span class="ns">Collections</span><span class="op">.</span><span class="ns">Generic</span><span class="op">;</span>
+
+<span class="kw">namespace</span> <span class="ns">MyProject.Services</span><span class="op">;</span>
+
+<span class="cmt">/// &lt;summary&gt;Processes customer orders.&lt;/summary&gt;</span>
+<span class="op">[</span><span class="fn">Service</span><span class="op">]</span>
+<span class="kw">public class</span> <span class="typ">OrderService</span> <span class="op">:</span> <span class="typ">IOrderService</span>
+<span class="op">{</span>
+    <span class="cmt">// Delegate type</span>
+    <span class="kw">public delegate</span> <span class="del">void</span> <span class="enu">OrderHandler</span><span class="op">(</span><span class="typ">Order</span> <span class="prm">order</span><span class="op">);</span>
+
+    <span class="cmt">// Event</span>
+    <span class="kw">public event</span> <span class="enu">OrderHandler</span> <span class="ev">OrderPlaced</span><span class="op">;</span>
+
+    <span class="kw">private readonly</span> <span class="typ">ILogger</span><span class="op">&lt;</span><span class="typ">OrderService</span><span class="op">&gt;</span> _logger<span class="op">;</span>
+
+    <span class="kw">public</span> <span class="fn">OrderService</span><span class="op">(</span><span class="typ">ILogger</span><span class="op">&lt;</span><span class="typ">OrderService</span><span class="op">&gt;</span> <span class="prm">logger</span><span class="op">)</span>
+    <span class="op">{</span>
+        _logger <span class="op">=</span> <span class="prm">logger</span><span class="op">;</span>
+    <span class="op">}</span>
+
+    <span class="cmt">// Generic method with type parameter</span>
+    <span class="kw">public</span> <span class="tp">T</span> <span class="fn">GetConfig</span><span class="op">&lt;</span><span class="tp">T</span><span class="op">&gt;(</span><span class="kw">string</span> <span class="prm">key</span><span class="op">)</span> <span class="op">=&gt;</span>
+        <span class="stc">ConfigReader</span><span class="op">.</span><span class="fn">Get</span><span class="op">&lt;</span><span class="tp">T</span><span class="op">&gt;(</span><span class="prm">key</span><span class="op">);</span>
+
+    <span class="cmt">// Async method — format string, mutable local, null-coalescing</span>
+    <span class="kw">public async</span> <span class="typ">Task</span><span class="op">&lt;</span><span class="typ">OrderResult</span><span class="op">&gt;</span> <span class="fn">PlaceOrderAsync</span><span class="op">(</span><span class="typ">Order</span> <span class="prm">order</span><span class="op">)</span>
+    <span class="op">{</span>
+        <span class="mut">var</span> id <span class="op">=</span> <span class="prm">order</span><span class="op">.</span>Id <span class="op">??</span> <span class="typ">Guid</span><span class="op">.</span><span class="fn">NewGuid</span><span class="op">();</span>
+        _logger<span class="op">.</span><span class="fn">LogInformation</span><span class="op">(</span><span class="str">"Placing order {</span><span class="fst">0</span><span class="str">} for {</span><span class="fst">1</span><span class="str">}"</span><span class="op">,</span> id<span class="op">,</span> <span class="prm">order</span><span class="op">.</span>Customer<span class="op">);</span>
+
+        <span class="cmt">// Inlay hints (LINQ chain) — dimmed so they don't fight the code</span>
+        <span class="kw">var</span> results <span class="op">=</span> <span class="prm">order</span><span class="op">.</span>Items
+            <span class="op">.</span><span class="ext">Where</span><span class="op">(</span><span class="inlay">item:</span> x <span class="op">=&gt;</span> x<span class="op">.</span>Stock <span class="op">&gt;</span> <span class="num">0</span><span class="op">)</span>
+            <span class="op">.</span><span class="ext">Select</span><span class="op">(</span><span class="inlay">selector:</span> x <span class="op">=&gt;</span> x<span class="op">.</span>Price <span class="op">*</span> x<span class="op">.</span>Qty<span class="op">)</span>
+            <span class="op">.</span><span class="ext">ToList</span><span class="op">();</span>
+
+        <span class="kw">await</span> <span class="fn">SaveAsync</span><span class="op">(</span><span class="prm">order</span><span class="op">);</span>
+        <span class="ev">OrderPlaced</span><span class="op">?.</span><span class="fn">Invoke</span><span class="op">(</span><span class="prm">order</span><span class="op">);</span>
+        <span class="kw">return new</span> <span class="typ">OrderResult</span> <span class="op">{</span> Id <span class="op">=</span> id <span class="op">};</span>
+    <span class="op">}</span>
+<span class="op">}</span>
+
+<span class="cmt">// Struct (value type)</span>
+<span class="kw">public readonly struct</span> <span class="enu">Money</span><span class="op">(</span><span class="kw">decimal</span> <span class="prm">amount</span><span class="op">,</span> <span class="kw">string</span> <span class="prm">currency</span><span class="op">)</span>
+<span class="op">{</span>
+    <span class="kw">public</span> <span class="kw">decimal</span> Amount <span class="op">{</span> <span class="kw">get</span><span class="op">;</span> <span class="op">}</span> <span class="op">=</span> <span class="prm">amount</span><span class="op">;</span>
+    <span class="kw">public</span> <span class="kw">string</span> Currency <span class="op">{</span> <span class="kw">get</span><span class="op">;</span> <span class="op">}</span> <span class="op">=</span> <span class="prm">currency</span><span class="op">;</span>
+<span class="op">}</span>
+
+<span class="cmt">// Enum</span>
+<span class="kw">public enum</span> <span class="enu">OrderStatus</span>
+<span class="op">{</span>
+    <span class="enu">Pending</span> <span class="op">=</span> <span class="num">0</span><span class="op">,</span>
+    <span class="enu">Processing</span> <span class="op">=</span> <span class="num">1</span><span class="op">,</span>
+    <span class="enu">Completed</span> <span class="op">=</span> <span class="num">2</span><span class="op">,</span>
+    <span class="enu">Cancelled</span> <span class="op">=</span> <span class="num">3</span>
+<span class="op">}</span>
+
+<span class="cmt">// Extension method</span>
+<span class="kw">public static class</span> <span class="stc">OrderExtensions</span>
+<span class="op">{</span>
+    <span class="kw">public static bool</span> <span class="ext">IsComplete</span><span class="op">(</span><span class="kw">this</span> <span class="typ">Order</span> <span class="prm">order</span><span class="op">)</span> <span class="op">=&gt;</span>
+        <span class="prm">order</span><span class="op">.</span>Status <span class="op">==</span> <span class="enu">OrderStatus</span><span class="op">.</span><span class="enu">Completed</span><span class="op">;</span>
+<span class="op">}</span></pre>
+  </div>
+</div>
+
+<!-- ── HTML ──────────────────────────────────────────────────── -->
+<div class="card">
+  <div class="card-header"><span>HTML</span><span>index.html</span></div>
+  <div class="card-body"><pre>
+<span class="op">&lt;!</span><span class="tag">DOCTYPE</span> <span class="att">html</span><span class="op">&gt;</span>
+<span class="op">&lt;</span><span class="tag">html</span> <span class="att">lang</span><span class="op">="</span><span class="str">en</span><span class="op">"&gt;</span>
+  <span class="op">&lt;</span><span class="tag">head</span><span class="op">&gt;</span>
+    <span class="op">&lt;</span><span class="tag">meta</span> <span class="att">charset</span><span class="op">="</span><span class="str">UTF-8</span><span class="op">" /&gt;</span>
+    <span class="op">&lt;</span><span class="tag">title</span><span class="op">&gt;</span>My App<span class="op">&lt;/</span><span class="tag">title</span><span class="op">&gt;</span>
+  <span class="op">&lt;/</span><span class="tag">head</span><span class="op">&gt;</span>
+  <span class="op">&lt;</span><span class="tag">body</span><span class="op">&gt;</span>
+    <span class="cmt">&lt;!-- main content --&gt;</span>
+    <span class="op">&lt;</span><span class="tag">h1</span> <span class="att">id</span><span class="op">="</span><span class="str">heading</span><span class="op">" </span><span class="att">class</span><span class="op">="</span><span class="str">title</span><span class="op">"&gt;</span>Hello <span class="ent">&amp;amp;</span> welcome<span class="op">&lt;/</span><span class="tag">h1</span><span class="op">&gt;</span>
+    <span class="op">&lt;</span><span class="tag">p</span> <span class="att">data-count</span><span class="op">="</span><span class="num">42</span><span class="op">"&gt;</span>Paragraph<span class="op">&lt;/</span><span class="tag">p</span><span class="op">&gt;</span>
+  <span class="op">&lt;/</span><span class="tag">body</span><span class="op">&gt;</span>
+<span class="op">&lt;/</span><span class="tag">html</span><span class="op">&gt;</span></pre>
+  </div>
+</div>
+
+<!-- ── Razor ─────────────────────────────────────────────────── -->
+<div class="card">
+  <div class="card-header"><span>Razor (.cshtml)</span><span>_Layout.cshtml</span></div>
+  <div class="card-body"><pre>
+<span class="op">@</span><span class="kw">model</span> <span class="typ">OrderViewModel</span>
+
+<span class="op">&lt;</span><span class="tag">div</span> <span class="att">class</span><span class="op">="</span><span class="str">order-card</span><span class="op">"&gt;</span>
+    <span class="op">&lt;</span><span class="tag">h2</span><span class="op">&gt;</span>Order <span style="background:var(--bg-razor)"><span class="op">@</span><span class="typ">Model</span><span class="op">.</span>Id</span><span class="op">&lt;/</span><span class="tag">h2</span><span class="op">&gt;</span>
+    <span style="background:var(--bg-razor)"><span class="op">@if</span> <span class="op">(</span><span class="typ">Model</span><span class="op">.</span><span class="fn">IsComplete</span><span class="op">())</span>
+    <span class="op">{</span>
+        <span class="op">&lt;</span><span class="tag">span</span> <span class="att">class</span><span class="op">="</span><span class="str">badge</span><span class="op">"&gt;</span>Done<span class="op">&lt;/</span><span class="tag">span</span><span class="op">&gt;</span>
+    <span class="op">}</span></span>
+    <span class="op">&lt;</span><span class="tag">p</span><span class="op">&gt;</span>Total: <span style="background:var(--bg-razor)"><span class="op">@</span><span class="typ">Model</span><span class="op">.</span>Total<span class="op">.</span><span class="fn">ToString</span><span class="op">(</span><span class="str">"C"</span><span class="op">)</span></span><span class="op">&lt;/</span><span class="tag">p</span><span class="op">&gt;</span>
+<span class="op">&lt;/</span><span class="tag">div</span><span class="op">&gt;</span></pre>
+  </div>
+</div>
+
+<!-- ── JSON ──────────────────────────────────────────────────── -->
+<div class="card">
+  <div class="card-header"><span>JSON</span><span>appsettings.json</span></div>
+  <div class="card-body"><pre>
+<span class="op">{</span>
+  <span class="json-key">"ConnectionStrings"</span><span class="op">:</span> <span class="op">{</span>
+    <span class="json-key">"Default"</span><span class="op">:</span> <span class="str">"Server=localhost;Database=shop"</span>
+  <span class="op">},</span>
+  <span class="json-key">"FeatureFlags"</span><span class="op">:</span> <span class="op">{</span>
+    <span class="json-key">"NewCheckout"</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span>
+    <span class="json-key">"LegacyApi"</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span>
+    <span class="json-key">"MaxRetries"</span><span class="op">:</span> <span class="num">3</span><span class="op">,</span>
+    <span class="json-key">"Timeout"</span><span class="op">:</span> <span class="kw">null</span>
+  <span class="op">}</span>
+<span class="op">}</span></pre>
+  </div>
+</div>
+
+<!-- ── XML ───────────────────────────────────────────────────── -->
+<div class="card">
+  <div class="card-header"><span>XML</span><span>config.xml</span></div>
+  <div class="card-body"><pre>
+<span class="op">&lt;?</span><span class="tag">xml</span> <span class="att">version</span><span class="op">="</span><span class="str">1.0</span><span class="op">"</span> <span class="att">encoding</span><span class="op">="</span><span class="str">utf-8</span><span class="op">"?&gt;</span>
+<span class="op">&lt;</span><span class="tag">configuration</span><span class="op">&gt;</span>
+  <span class="cmt">&lt;!-- database settings --&gt;</span>
+  <span class="op">&lt;</span><span class="tag">database</span> <span class="att">provider</span><span class="op">="</span><span class="str">postgres</span><span class="op">" </span><span class="att">port</span><span class="op">="</span><span class="num">5432</span><span class="op">"&gt;</span>
+    <span class="op">&lt;</span><span class="tag">host</span><span class="op">&gt;</span>localhost<span class="op">&lt;/</span><span class="tag">host</span><span class="op">&gt;</span>
+    <span class="op">&lt;</span><span class="tag">name</span><span class="op">&gt;</span>shopdb <span class="ent">&amp;amp;</span> audit<span class="op">&lt;/</span><span class="tag">name</span><span class="op">&gt;</span>
+  <span class="op">&lt;/</span><span class="tag">database</span><span class="op">&gt;</span>
+<span class="op">&lt;/</span><span class="tag">configuration</span><span class="op">&gt;</span></pre>
+  </div>
+</div>
+
+<!-- ── YAML ──────────────────────────────────────────────────── -->
+<div class="card">
+  <div class="card-header"><span>YAML</span><span>docker-compose.yml</span></div>
+  <div class="card-body"><pre>
+<span class="yaml-key">version</span><span class="op">:</span> <span class="str">"3.9"</span>
+<span class="yaml-key">services</span><span class="op">:</span>
+  <span class="yaml-key">api</span><span class="op">:</span>
+    <span class="yaml-key">image</span><span class="op">:</span> <span class="str">myapp:latest</span>
+    <span class="yaml-key">ports</span><span class="op">:</span>
+      <span class="op">-</span> <span class="str">"8080:80"</span>
+    <span class="yaml-key">environment</span><span class="op">:</span>
+      <span class="yaml-key">ASPNETCORE_ENVIRONMENT</span><span class="op">:</span> <span class="str">Production</span>
+      <span class="yaml-key">MAX_WORKERS</span><span class="op">:</span> <span class="num">4</span>
+    <span class="yaml-key">depends_on</span><span class="op">:</span>
+      <span class="op">-</span> <span class="str">postgres</span>
+      <span class="op">-</span> <span class="str">redis</span></pre>
+  </div>
+</div>
+
+</body>
+</html>

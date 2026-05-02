@@ -1,0 +1,12 @@
+{
+  "name": "tokyo-night-silent-storm",
+  "version": "1.0.0",
+  "description": "Tokyo Night Silent Storm - dark theme for JetBrains Rider",
+  "license": "MIT",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "devDependencies": {
+    "archiver": "^6.0.0"
+  }
+}
