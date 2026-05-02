@@ -39,6 +39,13 @@
     "TabbedPane.hoverColor": "#7dcfff",
     "TabbedPane.focusColor": "#7aa2f7",
     "Tree.modifiedItemForeground": "#7dcfff",
+    "ToolWindow.background": "#2a2d3e",
+    "ToolWindow.Header.background": "#2a2d3e",
+    "ToolWindow.Header.inactiveBackground": "#2a2d3e",
+    "ToolWindow.Header.borderColor": "#00000000",
+    "ToolWindow.HeaderCloseButton.background": "#2a2d3e",
+    "ToolWindow.HeaderTab.background": "#2a2d3e",
+    "ToolWindow.HeaderTab.inactiveBackground": "#2a2d3e",
     "ToolWindow.HeaderTab.underlineColor": "#7aa2f7"
   }
 }

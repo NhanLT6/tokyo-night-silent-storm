@@ -4,7 +4,8 @@
   "description": "Tokyo Night Silent Storm - dark theme for JetBrains Rider",
   "license": "MIT",
   "scripts": {
-    "build": "node build.js"
+    "build": "node build.js",
+    "release": "bash release.sh"
   },
   "devDependencies": {
     "archiver": "^6.0.0"
