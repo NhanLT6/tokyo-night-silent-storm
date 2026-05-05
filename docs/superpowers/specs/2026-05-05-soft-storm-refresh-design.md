@@ -13,6 +13,9 @@ A palette refresh of Tokyo Night Silent Storm that shifts the mood from aged/hea
 - Lift background depth just enough to reduce the "heavy" feel
 - Give local variables a distinct sky-blue color (was invisible, same as foreground)
 - Replace amber parameters with a cooler desaturated rose that fits the palette's temperature
+- Reduce Islands chrome/border noise while keeping internal dividers readable
+- Make current row and find results easier to see without turning them into accent-heavy UI
+- Soften VCS markers so large edit sessions do not pull too much attention
 - Keep enums/structs/selection/foreground unchanged — they already read as pastel
 
 ## What Does Not Change
@@ -31,10 +34,12 @@ A palette refresh of Tokyo Night Silent Storm that shifts the mood from aged/hea
 
 | Role | Original | Soft Storm |
 |---|---|---|
-| Chrome / main window | `#22253a` | `#242840` |
+| Chrome / main window | `#22253a` | `#20243a` |
 | Editor / panels | `#2a2d3e` | `#2c2f47` |
-| Caret row | `#303450` | `#333758` |
+| Caret row | `#303450` | `#25293f` |
 | Selection | `#2d4f67` | `#2d4f67` *(unchanged)* |
+
+`#242840` is still used for some secondary chrome surfaces (for example search field and editor-scheme notification/sticky backgrounds), but visible outer IDE chrome uses the darker `#20243a`.
 
 ### Syntax
 
@@ -65,7 +70,11 @@ The `DEFAULT_LOCAL_VARIABLE`, `DEFAULT_REASSIGNED_LOCAL_VARIABLE`, `ReSharper.MU
 | Key | Original | Soft Storm |
 |---|---|---|
 | `*.background` | `#2a2d3e` | `#2c2f47` |
-| `MainWindow.background` | `#22253a` | `#242840` |
+| `MainWindow.background` | `#22253a` | `#20243a` |
+| `ToolWindow.Stripe.background` | `#22253a` | `#20243a` |
+| `MainToolbar.background` | `#22253a` | `#20243a` |
+| `Toolbar.background` / `NavBar.background` | `#22253a` | `#20243a` |
+| `EditorTabs.background` | inherited | `#2c2f47` |
 | `EditorTabs.underlinedBorderColor` | `#bb9af7` | `#b8a4e8` |
 | `Button.default.startBackground` | `#bb9af7` | `#b8a4e8` |
 | `Button.default.endBackground` | `#bb9af7` | `#b8a4e8` |
@@ -79,15 +88,56 @@ The `DEFAULT_LOCAL_VARIABLE`, `DEFAULT_REASSIGNED_LOCAL_VARIABLE`, `ReSharper.MU
 | `TabbedPane.focusColor` | `#bb9af7` | `#b8a4e8` |
 | `ToolWindow.HeaderTab.underlineColor` | `#bb9af7` | `#b8a4e8` |
 | `ToolWindow.Button.selectedBackground` | `#7c5cbf` | `#7060b0` |
+| `Island.borderColor` | inherited / theme color | `#2c2f47` |
+| `Borders.color` | inherited dark gray | `#3a3f5d` |
+| `Separator.foreground` | inherited dark gray | `#3a3f5d` |
+| `Component.borderColor` | inherited dark gray | `#3a3f5d` |
+| `Component.disabledBorderColor` | inherited dark gray | `#343954` |
 | `Component.focusColor` | `#bb9af780` | `#b8a4e880` |
 | `Component.focusedBorderColor` | `#bb9af7` | `#b8a4e8` |
+| `Component.hoverBorderColor` | inherited dark gray | `#414868` |
+| `SearchMatch.startBackground` | inherited | `#b8a4e866` |
+| `SearchMatch.endBackground` | inherited | `#b8a4e866` |
+| `Editor.SearchField.background` | inherited / blended with editor | `#242840` |
+| `Editor.SearchField.borderColor` | inherited | `#454b70` |
 | `RadioButton.*Selected*` | `#bb9af7` | `#b8a4e8` |
 | `ProgressBar.foreground` | `#bb9af7` | `#b8a4e8` |
 | `ProgressBar.indeterminate.*` | `#bb9af7 / #cba6f7` | `#b8a4e8 / #c8b8f0` |
 | `ToolTip.borderColor` | `#bb9af7` | `#b8a4e8` |
 | `Checkbox.*Selected*` | `#bb9af7` | `#b8a4e8` |
 
-All other `theme.json` keys (background colors) follow the same `#22253a→#242840` / `#2a2d3e→#2c2f47` substitution.
+Most `theme.json` panel/background keys follow the same `#2a2d3e→#2c2f47` substitution. Visible outer chrome is intentionally darker (`#20243a`) than the initial lifted chrome color (`#242840`).
+
+### Editor Interaction Tuning (scheme XML)
+
+| Role / key | Final color | Note |
+|---|---|---|
+| `CARET_ROW_COLOR` | `#25293f` | darker than editor background so the current row reads clearly |
+| `SELECTION_BACKGROUND` | `#2d4f67` | unchanged from original palette |
+| `SEARCH_RESULT_ATTRIBUTES` background | `#473f68` | stronger normal find match |
+| `SEARCH_RESULT_ATTRIBUTES` border | `#8c7ec0` | boxed via `EFFECT_TYPE=0`, visible but not neon |
+| `TEXT_SEARCH_RESULT_ATTRIBUTES` background | `#473f68` | same as normal find match |
+| `TEXT_SEARCH_RESULT_ATTRIBUTES` border | `#8c7ec0` | boxed via `EFFECT_TYPE=0` |
+| `WRITE_SEARCH_RESULT_ATTRIBUTES` background | `#365a78` | current / active find match |
+| `WRITE_SEARCH_RESULT_ATTRIBUTES` border | `#85a7f5` | boxed via `EFFECT_TYPE=0`, intentionally more attention-grabbing |
+
+### VCS Marker Tuning
+
+| Role / keys | Final color | Note |
+|---|---|---|
+| Added gutter and file statuses | `#79ad7b` | softer green for `ADDED_LINES_COLOR`, `FILESTATUS_ADDED`, copied/external-added states |
+| Modified gutter and file statuses | `#b79a67` | softer amber-brown for `MODIFIED_LINES_COLOR`, modified/hijacked/obsolete/not-changed states |
+| Deleted / unknown / switched file statuses | `#c7778a` | softer rose-red, less distracting than syntax error pink |
+| `GIT_TOOLBOX.CHANGED_COUNT_ATTRIBUTES` | `#b79a67` | matches modified marker family |
+
+This supersedes the initial amber split for VCS markers only. Diagnostics, TODOs, CSS class names, events, format strings, diagrams, and similar warm non-parameter tokens continue to use `#c9a55a`.
+
+### Islands Border Model
+
+- Outer island border: `Island.borderColor` is set to `#2c2f47`, matching island/panel background so island outlines visually disappear against the darker outer chrome.
+- Internal island borders/dividers: `Borders.color`, `Separator.foreground`, and `Component.borderColor` use `#3a3f5d`, a muted blue-lavender divider that fits the palette better than dark neutral gray.
+- Disabled internal borders use `#343954`; hover internal borders use `#414868`.
+- Do not make internal borders transparent: they provide necessary structure inside tool windows and editor panels.
 
 ---
 
@@ -99,15 +149,15 @@ All other `theme.json` keys (background colors) follow the same `#22253a→#2428
 2. `tokyo-night-silent-storm.xml` — all syntax/semantic attribute colors
 3. `preview.html` — update CSS variables to reflect new palette
 
-**Strategy:** global find-replace for most colors, but `#e0af68` (amber) is shared by both parameter tokens AND unrelated tokens (VCS indicators, warnings, TODO, CSS class names, events, format strings). It must be handled in two passes — not a single global replace.
+**Strategy:** global find-replace for most colors, but `#e0af68` (amber) is shared by both parameter tokens AND unrelated warm tokens (warnings, TODO, CSS class names, events, format strings, diagrams, and VCS markers). It must be handled in targeted passes — not a single global replace.
 
-**Global substitution map** (safe to replace everywhere):
+**Base substitution map** (safe first pass, followed by the overrides listed above):
 
 | Find | Replace | Context |
 |---|---|---|
-| `22253a` | `242840` | background (chrome) |
+| `22253a` | `242840` | base chrome hints; visible UI chrome is overridden to `#20243a` |
 | `2a2d3e` | `2c2f47` | background (editor) |
-| `303450` | `333758` | caret row |
+| `303450` | `25293f` | caret row |
 | `bb9af7` | `b8a4e8` | keywords + accent |
 | `cba6f7` | `c8b8f0` | accent hover / lighter purple |
 | `7aa2f7` | `85a7f5` | functions |
@@ -129,12 +179,12 @@ Tokens that change to rose `#ccb0ba`:
 - `MESSAGE_ARGUMENT`
 
 Tokens that change to softened amber `#c9a55a` (keep warm, just muted):
-- VCS: `MODIFIED_LINES_COLOR`, `FILESTATUS_MODIFIED`, `FILESTATUS_HIJACKED`, `FILESTATUS_OBSOLETE`, `FILESTATUS_NOT_CHANGED_IMMEDIATE`, `FILESTATUS_NOT_CHANGED_RECURSIVE`, `FILESTATUS_addedOutside`
 - Diagnostics: `WARNING_ATTRIBUTES`, `TYPO`
 - Editor: `TODO_DEFAULT_ATTRIBUTES`, `CSS.CLASS_NAME`, `MARKDOWN_LINK_LABEL`, `MARKDOWN_STRIKETHROUGH`, `XPATH.KEYWORD`, `MACRONAME`
 - ReSharper: `ReSharper.EVENT_IDENTIFIER`, `ReSharper.FORMAT_STRING_ITEM`, `ReSharper.MATCHED_FORMAT_STRING_ITEM`
 - Diagrams: `DIAGRAM_GENERALIZATION_EDGE`, `DIAGRAM_HOT_SPOTS`
-- Git Toolbox: `GIT_TOOLBOX.CHANGED_COUNT_ATTRIBUTES`
+
+VCS markers use the softer dedicated set from **VCS Marker Tuning** instead of `#c9a55a`.
 
 **New token (local variables):** `#a0c5e9` — set on `DEFAULT_LOCAL_VARIABLE`, `DEFAULT_REASSIGNED_LOCAL_VARIABLE`, `ReSharper.MUTABLE_LOCAL_VARIABLE_IDENTIFIER`, `JS.LOCAL_VARIABLE`, `JS.INSTANCE_MEMBER_VARIABLE` (currently all inherit foreground).
 
@@ -142,4 +192,4 @@ Tokens that change to softened amber `#c9a55a` (keep warm, just muted):
 
 ## Preview HTML
 
-Update CSS variables at the top of `preview.html` to reflect all new values. No structural changes to the preview needed.
+Update CSS variables at the top of `preview.html` to reflect all final palette values, including `--border-inner`, caret row, search match colors, and the darker outer chrome. No structural changes to the preview content needed.

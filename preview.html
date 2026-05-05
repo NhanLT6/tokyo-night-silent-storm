@@ -6,41 +6,49 @@
   <style>
     /* ── Palette variables ─────────────────────────────────────── */
     :root {
-      --bg-chrome:      #22253a;
-      --bg-panel:       #2a2d3e;
-      --bg-caret-row:   #303450;
+      --bg-chrome:      #20243a;
+      --bg-panel:       #2c2f47;
+      --bg-caret-row:   #25293f;
       --bg-selection:   #2d4f67;
       --bg-razor:       #363b54;
-      --bg-card:        #2a2d3e;
+      --bg-card:        #2c2f47;
+      --border-island:  #2c2f47;
+      --border-inner:   #3a3f5d;
 
       --fg:             #c0caf5;
       --fg-dim:         #565f89;
       --fg-line-num:    #3b3f5c;
       --fg-line-active: #737aa2;
 
-      --accent:         #7aa2f7;
+      --accent:         #b8a4e8;
       --accent-light:   #7dcfff;
 
-      --keyword:        #bb9af7;
-      --func:           #7aa2f7;
-      --string:         #9ece6a;
-      --number:         #ff9e64;
-      --type:           #2ac3de;
+      --keyword:        #b8a4e8;
+      --func:           #85a7f5;
+      --string:         #8fc472;
+      --number:         #d4936a;
+      --type:           #4dc4d8;
       --enum:           #73daca;
-      --comment:        #565f89;
-      --operator:       #89ddff;
-      --param:          #e0af68;
-      --escape:         #89ddff;
-      --entity:         #ff9e64;
-      --tag:            #f7768e;
+      --comment:        #5e6590;
+      --operator:       #7ab8d8;
+      --local:          #a0c5e9;
+      --param:          #ccb0ba;
+      --warm:           #c9a55a;
+      --escape:         #7ab8d8;
+      --entity:         #d4936a;
+      --tag:            #e07891;
       --attr:           #7dcfff;
       --json-key:       #7dcfff;
       --yaml-key:       #7dcfff;
-      --error:          #f7768e;
-      --warning:        #e0af68;
+      --error:          #e07891;
+      --warning:        #c9a55a;
+      --search-match:   #473f68;
+      --search-border:  #8c7ec0;
+      --search-current: #365a78;
+      --search-current-border: #85a7f5;
 
       --inlay-fg:       #414868;
-      --inlay-bg:       #22253a;
+      --inlay-bg:       #20243a;
     }
 
     /* ── Reset / base ──────────────────────────────────────────── */
@@ -66,7 +74,7 @@
       border-radius: 8px;
       overflow: hidden;
       margin-bottom: 24px;
-      border: 1px solid #1a1d2e;
+      border: 1px solid var(--border-island);
     }
 
     .ide-toolbar {
@@ -76,14 +84,14 @@
       align-items: center;
       padding: 0 12px;
       gap: 8px;
-      border-bottom: 1px solid #1a1d2e;
+      border-bottom: 1px solid var(--border-inner);
     }
     .ide-toolbar-dot {
       width: 12px; height: 12px; border-radius: 50%;
     }
-    .ide-toolbar-dot:nth-child(1) { background: #f7768e; }
-    .ide-toolbar-dot:nth-child(2) { background: #e0af68; }
-    .ide-toolbar-dot:nth-child(3) { background: #9ece6a; }
+    .ide-toolbar-dot:nth-child(1) { background: #e07891; }
+    .ide-toolbar-dot:nth-child(2) { background: #c9a55a; }
+    .ide-toolbar-dot:nth-child(3) { background: #8fc472; }
     .ide-toolbar-title {
       flex: 1; text-align: center; color: var(--fg-dim); font-size: 12px;
       font-family: system-ui, sans-serif;
@@ -93,7 +101,7 @@
       background: var(--bg-panel);
       display: flex;
       align-items: stretch;
-      border-bottom: 1px solid #1a1d2e;
+      border-bottom: 1px solid var(--border-inner);
       height: 32px;
     }
     .ide-tab {
@@ -102,7 +110,7 @@
       align-items: center;
       font-size: 12px;
       color: var(--fg-dim);
-      border-right: 1px solid #1a1d2e;
+      border-right: 1px solid var(--border-inner);
       cursor: default;
       font-family: system-ui, sans-serif;
     }
@@ -119,7 +127,7 @@
     .ide-sidebar {
       background: var(--bg-chrome);
       width: 200px;
-      border-right: 1px solid #1a1d2e;
+      border-right: 1px solid var(--border-inner);
       padding: 8px;
       font-size: 12px;
       font-family: system-ui, sans-serif;
@@ -165,7 +173,7 @@
       gap: 16px;
       font-size: 11px;
       color: var(--fg-dim);
-      border-top: 1px solid #1a1d2e;
+      border-top: 1px solid var(--border-inner);
       font-family: system-ui, sans-serif;
     }
     .ide-status-accent { color: var(--accent); }
@@ -195,14 +203,14 @@
       border-radius: 6px;
       margin-bottom: 20px;
       overflow: hidden;
-      border: 1px solid #1f2235;
+      border: 1px solid var(--border-island);
     }
     .card-header {
       background: var(--bg-chrome);
       padding: 6px 14px;
       font-size: 11px;
       color: var(--fg-dim);
-      border-bottom: 1px solid #1f2235;
+      border-bottom: 1px solid var(--border-inner);
       font-family: system-ui, sans-serif;
       display: flex;
       justify-content: space-between;
@@ -238,11 +246,11 @@
     .att { color: var(--attr); }
     .ns  { color: var(--fg); }
     .del { color: var(--keyword); font-style: italic; }
-    .ev  { color: var(--param); font-weight: 600; }
+    .ev  { color: var(--warm); font-weight: 600; }
     .ext { color: var(--func); font-style: italic; }
     .tp  { color: var(--type); font-style: italic; }
-    .mut { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--fg-dim); }
-    .fst { color: var(--param); }
+    .mut { color: var(--local); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--fg-dim); }
+    .fst { color: var(--warm); }
     .stc { color: var(--type); font-style: italic; }
     .err { color: var(--error); text-decoration: wavy underline; text-decoration-color: var(--error); }
   </style>
@@ -314,17 +322,19 @@
 <!-- ── Palette ───────────────────────────────────────────────── -->
 <h3>Palette</h3>
 <div class="swatches">
-  <div class="swatch"><div class="swatch-dot" style="background:#bb9af7"></div>keyword #bb9af7</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#7aa2f7"></div>function #7aa2f7</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#9ece6a"></div>string #9ece6a</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#ff9e64"></div>number #ff9e64</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#2ac3de"></div>type #2ac3de</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#b8a4e8"></div>keyword #b8a4e8</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#85a7f5"></div>function #85a7f5</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#8fc472"></div>string #8fc472</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#d4936a"></div>number #d4936a</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#4dc4d8"></div>type #4dc4d8</div>
   <div class="swatch"><div class="swatch-dot" style="background:#73daca"></div>enum/struct #73daca</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#89ddff"></div>operator #89ddff</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#e0af68"></div>param/event #e0af68</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#565f89"></div>comment #565f89</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#7ab8d8"></div>operator #7ab8d8</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#a0c5e9"></div>local #a0c5e9</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#ccb0ba"></div>param #ccb0ba</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#c9a55a"></div>event/format #c9a55a</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#5e6590"></div>comment #5e6590</div>
   <div class="swatch"><div class="swatch-dot" style="background:#c0caf5"></div>fg #c0caf5</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#f7768e"></div>error #f7768e</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#e07891"></div>error #e07891</div>
   <div class="swatch"><div class="swatch-dot" style="background:#7dcfff"></div>attr/link #7dcfff</div>
 </div>
 
