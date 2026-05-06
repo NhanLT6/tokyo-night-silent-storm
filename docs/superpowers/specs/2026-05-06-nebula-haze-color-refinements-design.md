@@ -116,6 +116,19 @@ Six targeted color adjustments to the Nebula Haze theme. None of these change th
 | 5 | Comments | `5e6590` | `7880a8` | hsl(232, 23%, 57%) |
 | 6 | Git modified | `bba586` | `a89e5c` | hsl(48, 30%, 51%) |
 
+### 7. Line Numbers — Visible
+
+| Key | Old | New |
+|---|---|---|
+| `LINE_NUMBERS_COLOR` | `2a2e48` | `454d74` |
+| `GUTTER_BACKGROUND` | `22253a` | `1e2235` |
+
+**Why:** `#2a2e48` against the `#22253a` background (now `#1e2235`) had near-zero contrast — line numbers were invisible. Gutter background updated to match the new editor background.
+
+**New value:** `#454d74` — hsl(234, 25%, 37%). Readable at a glance, clearly secondary to syntax tokens. `LINE_NUMBER_ON_CARET_ROW_COLOR` stays `#737aa2` (brighter, marks the active line).
+
+---
+
 ## Files Affected
 
 - `nebula-haze.xml` — syntax tokens (changes 1, 2, 4, 5, 6)
