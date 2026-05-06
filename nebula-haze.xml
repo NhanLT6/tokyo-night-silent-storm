@@ -39,10 +39,10 @@
     <option name="WHITESPACES" value="565f89" />
 
     <!-- Console backgrounds -->
-    <option name="CONSOLE_BACKGROUND_KEY" value="22253a" />
-    <option name="BLOCK_TERMINAL_DEFAULT_BACKGROUND" value="22253a" />
-    <option name="BLOCK_TERMINAL_BLOCK_BACKGROUND_START" value="22253a" />
-    <option name="BLOCK_TERMINAL_BLOCK_BACKGROUND_END" value="22253a" />
+    <option name="CONSOLE_BACKGROUND_KEY" value="1e2235" />
+    <option name="BLOCK_TERMINAL_DEFAULT_BACKGROUND" value="1e2235" />
+    <option name="BLOCK_TERMINAL_BLOCK_BACKGROUND_START" value="1e2235" />
+    <option name="BLOCK_TERMINAL_BLOCK_BACKGROUND_END" value="1e2235" />
     <option name="BLOCK_TERMINAL_DEFAULT_FOREGROUND" value="c0caf5" />
     <option name="BLOCK_TERMINAL_PROMPT_SEPARATOR_COLOR" value="2a2e48" />
     <option name="BLOCK_TERMINAL_SELECTED_BLOCK_BACKGROUND" value="3c3465" />
@@ -58,14 +58,14 @@
     <!-- Popups / tooltips -->
     <option name="DOCUMENTATION_COLOR" value="13152a" />
     <option name="LOOKUP_COLOR" value="13152a" />
-    <option name="INFORMATION_HINT" value="22253a" />
-    <option name="QUESTION_HINT" value="22253a" />
+    <option name="INFORMATION_HINT" value="1e2235" />
+    <option name="QUESTION_HINT" value="1e2235" />
     <option name="TOOLTIP" value="13152a" />
     <option name="NOTIFICATION_BACKGROUND" value="1e2138" />
     <option name="PROMOTION_PANE" value="0f1020" />
     <option name="STICKY_LINES_BACKGROUND" value="1e2138" />
     <option name="RECENT_LOCATIONS_SELECTION" value="3c3465" />
-    <option name="INLINE_REFACTORING_SETTINGS_DEFAULT" value="22253a" />
+    <option name="INLINE_REFACTORING_SETTINGS_DEFAULT" value="1e2235" />
     <option name="INLINE_REFACTORING_SETTINGS_FOCUSED" value="2a2e48" />
     <option name="INLINE_REFACTORING_SETTINGS_HOVERED" value="2a2e4a" />
 
@@ -77,20 +77,20 @@
     <!-- Scrollbar -->
     <option name="ScrollBar.Mac.thumbColor" value="85a7f580" />
     <option name="ScrollBar.Mac.hoverThumbColor" value="85a7f5" />
-    <option name="ScrollBar.Mac.trackColor" value="22253a" />
-    <option name="ScrollBar.Mac.hoverTrackColor" value="22253a" />
+    <option name="ScrollBar.Mac.trackColor" value="1e2235" />
+    <option name="ScrollBar.Mac.hoverTrackColor" value="1e2235" />
     <option name="ScrollBar.Mac.Transparent.thumbColor" value="85a7f580" />
     <option name="ScrollBar.Mac.Transparent.hoverThumbColor" value="85a7f5C0" />
-    <option name="ScrollBar.Mac.Transparent.trackColor" value="22253a" />
-    <option name="ScrollBar.Mac.Transparent.hoverTrackColor" value="22253a" />
+    <option name="ScrollBar.Mac.Transparent.trackColor" value="1e2235" />
+    <option name="ScrollBar.Mac.Transparent.hoverTrackColor" value="1e2235" />
     <option name="ScrollBar.thumbColor" value="85a7f580" />
     <option name="ScrollBar.hoverThumbColor" value="85a7f5" />
-    <option name="ScrollBar.trackColor" value="22253a" />
-    <option name="ScrollBar.hoverTrackColor" value="22253a" />
+    <option name="ScrollBar.trackColor" value="1e2235" />
+    <option name="ScrollBar.hoverTrackColor" value="1e2235" />
     <option name="ScrollBar.Transparent.thumbColor" value="85a7f580" />
     <option name="ScrollBar.Transparent.hoverThumbColor" value="85a7f5" />
-    <option name="ScrollBar.Transparent.trackColor" value="22253a" />
-    <option name="ScrollBar.Transparent.hoverTrackColor" value="22253a" />
+    <option name="ScrollBar.Transparent.trackColor" value="1e2235" />
+    <option name="ScrollBar.Transparent.hoverTrackColor" value="1e2235" />
     <option name="Scrollbar.Tabs.ThumbColor" value="85a7f580" />
     <option name="Scrollbar.Tabs.HoveredThumbColor" value="85a7f5" />
     <option name="Scrollbar.Tabs.TransparentThumbColor" value="85a7f580" />
@@ -108,10 +108,10 @@
     <option name="VCS_ANNOTATIONS_COLOR_5" value="73daca" />
 
     <!-- Diagrams -->
-    <option name="DIAGRAM_NODE_BACKGROUND" value="22253a" />
+    <option name="DIAGRAM_NODE_BACKGROUND" value="1e2235" />
     <option name="DIAGRAM_NODE_BORDER" value="414868" />
     <option name="DIAGRAM_NODE_HEADER" value="2a2e4a" />
-    <option name="DIAGRAM_NOTE_BACKGROUND" value="22253a" />
+    <option name="DIAGRAM_NOTE_BACKGROUND" value="1e2235" />
     <option name="DIAGRAM_NOTE_BORDER" value="c0caf5" />
     <option name="DIAGRAM_NOTE_SLOPPY_BACKGROUND" value="414868" />
     <option name="DIAGRAM_FINE_GRID" value="2a2e4a" />
@@ -179,7 +179,7 @@
     <option name="TEXT">
       <value>
         <option name="FOREGROUND" value="c0caf5" />
-        <option name="BACKGROUND" value="22253a" />
+        <option name="BACKGROUND" value="1e2235" />
         <option name="EFFECT_TYPE" value="5" />
       </value>
     </option>
@@ -765,13 +765,13 @@
     <option name="TAB_SELECTED">
       <value>
         <option name="FOREGROUND" value="c0caf5" />
-        <option name="BACKGROUND" value="22253a" />
+        <option name="BACKGROUND" value="1e2235" />
       </value>
     </option>
     <option name="TAB_SELECTED_INACTIVE">
       <value>
         <option name="FOREGROUND" value="565f89" />
-        <option name="BACKGROUND" value="22253a" />
+        <option name="BACKGROUND" value="1e2235" />
       </value>
     </option>
 
@@ -785,7 +785,7 @@
     <option name="BREADCRUMBS_DEFAULT">
       <value>
         <option name="FOREGROUND" value="565f89" />
-        <option name="BACKGROUND" value="22253a" />
+        <option name="BACKGROUND" value="1e2235" />
       </value>
     </option>
     <option name="BREADCRUMBS_HOVERED">
@@ -797,7 +797,7 @@
     <option name="BREADCRUMBS_INACTIVE">
       <value>
         <option name="FOREGROUND" value="2a2e48" />
-        <option name="BACKGROUND" value="22253a" />
+        <option name="BACKGROUND" value="1e2235" />
       </value>
     </option>
 
