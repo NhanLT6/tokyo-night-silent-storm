@@ -404,47 +404,47 @@
     <!-- ── Operators / punctuation ────────────────────────────── -->
     <option name="DEFAULT_OPERATION_SIGN">
       <value>
-        <option name="FOREGROUND" value="7ab8d8" />
+        <option name="FOREGROUND" value="e09a68" />
       </value>
     </option>
     <option name="DEFAULT_BRACES">
       <value>
-        <option name="FOREGROUND" value="7ab8d8" />
+        <option name="FOREGROUND" value="e09a68" />
       </value>
     </option>
     <option name="DEFAULT_BRACKETS">
       <value>
-        <option name="FOREGROUND" value="7ab8d8" />
+        <option name="FOREGROUND" value="e09a68" />
       </value>
     </option>
     <option name="DEFAULT_PARENTHS">
       <value>
-        <option name="FOREGROUND" value="7ab8d8" />
+        <option name="FOREGROUND" value="e09a68" />
       </value>
     </option>
     <option name="DEFAULT_COMMA">
       <value>
-        <option name="FOREGROUND" value="7ab8d8" />
+        <option name="FOREGROUND" value="e09a68" />
       </value>
     </option>
     <option name="DEFAULT_DOT">
       <value>
-        <option name="FOREGROUND" value="7ab8d8" />
+        <option name="FOREGROUND" value="e09a68" />
       </value>
     </option>
     <option name="DEFAULT_SEMICOLON">
       <value>
-        <option name="FOREGROUND" value="7ab8d8" />
+        <option name="FOREGROUND" value="e09a68" />
       </value>
     </option>
     <option name="Closure braces">
       <value>
-        <option name="FOREGROUND" value="7ab8d8" />
+        <option name="FOREGROUND" value="e09a68" />
       </value>
     </option>
     <option name="CSHARP_OPERATOR_SIGN">
       <value>
-        <option name="FOREGROUND" value="7ab8d8" />
+        <option name="FOREGROUND" value="e09a68" />
       </value>
     </option>
 
@@ -1317,7 +1317,7 @@
     </option>
     <option name="HTTP_REQUEST_PORT">
       <value>
-        <option name="FOREGROUND" value="7ab8d8" />
+        <option name="FOREGROUND" value="e09a68" />
       </value>
     </option>
 
@@ -1367,7 +1367,7 @@
     </option>
     <option name="CSS.COLOR">
       <value>
-        <option name="FOREGROUND" value="7ab8d8" />
+        <option name="FOREGROUND" value="e09a68" />
       </value>
     </option>
     <option name="CSS.FUNCTION">
@@ -1521,7 +1521,7 @@
     </option>
     <option name="JS.IF_ELSE">
       <value>
-        <option name="FOREGROUND" value="7ab8d8" />
+        <option name="FOREGROUND" value="b09ce8" />
         <option name="FONT_TYPE" value="2" />
       </value>
     </option>
@@ -1542,7 +1542,7 @@
     </option>
     <option name="JS.MODULE_KEYWORD">
       <value>
-        <option name="FOREGROUND" value="7ab8d8" />
+        <option name="FOREGROUND" value="b09ce8" />
         <option name="FONT_TYPE" value="2" />
       </value>
     </option>
@@ -1580,13 +1580,13 @@
     </option>
     <option name="JS.TRY_CATCH">
       <value>
-        <option name="FOREGROUND" value="7ab8d8" />
+        <option name="FOREGROUND" value="b09ce8" />
         <option name="FONT_TYPE" value="2" />
       </value>
     </option>
     <option name="JS.YIELD">
       <value>
-        <option name="FOREGROUND" value="7ab8d8" />
+        <option name="FOREGROUND" value="b09ce8" />
         <option name="FONT_TYPE" value="2" />
       </value>
     </option>
@@ -1896,7 +1896,7 @@
     <!-- ── .gitignore ─────────────────────────────────────────── -->
     <option name="IGNORE.BRACKET">
       <value>
-        <option name="FOREGROUND" value="7ab8d8" />
+        <option name="FOREGROUND" value="e09a68" />
         <option name="FONT_TYPE" value="1" />
       </value>
     </option>
@@ -1913,7 +1913,7 @@
     </option>
     <option name="IGNORE.NEGATION">
       <value>
-        <option name="FOREGROUND" value="7ab8d8" />
+        <option name="FOREGROUND" value="e09a68" />
         <option name="FONT_TYPE" value="1" />
       </value>
     </option>
