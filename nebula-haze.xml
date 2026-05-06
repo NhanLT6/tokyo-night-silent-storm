@@ -276,28 +276,28 @@
     <!-- ── Types ──────────────────────────────────────────────── -->
     <option name="DEFAULT_CLASS_NAME">
       <value>
-        <option name="FOREGROUND" value="b1d0e6" />
+        <option name="FOREGROUND" value="cabae4" />
       </value>
     </option>
     <option name="ABSTRACT_CLASS_NAME_ATTRIBUTES">
       <value>
-        <option name="FOREGROUND" value="b1d0e6" />
+        <option name="FOREGROUND" value="cabae4" />
       </value>
     </option>
     <option name="Abstract class name">
       <value>
-        <option name="FOREGROUND" value="b1d0e6" />
+        <option name="FOREGROUND" value="cabae4" />
       </value>
     </option>
     <option name="DEFAULT_INTERFACE_NAME">
       <value>
-        <option name="FOREGROUND" value="b1d0e6" />
+        <option name="FOREGROUND" value="cabae4" />
         <option name="FONT_TYPE" value="2" />
       </value>
     </option>
     <option name="DEFAULT_CLASS_REFERENCE">
       <value>
-        <option name="FOREGROUND" value="b1d0e6" />
+        <option name="FOREGROUND" value="cabae4" />
       </value>
     </option>
     <option name="DEFAULT_TAG">
@@ -307,7 +307,7 @@
     </option>
     <option name="TYPEDEF">
       <value>
-        <option name="FOREGROUND" value="b1d0e6" />
+        <option name="FOREGROUND" value="cabae4" />
       </value>
     </option>
     <option name="Class" baseAttributes="" />
@@ -1510,7 +1510,7 @@
     </option>
     <option name="JS.GLOBAL_FUNCTION">
       <value>
-        <option name="FOREGROUND" value="b1d0e6" />
+        <option name="FOREGROUND" value="cabae4" />
         <option name="FONT_TYPE" value="2" />
       </value>
     </option>
@@ -1603,7 +1603,7 @@
     </option>
     <option name="TS.PRIM_TYPE">
       <value>
-        <option name="FOREGROUND" value="b1d0e6" />
+        <option name="FOREGROUND" value="cabae4" />
       </value>
     </option>
     <option name="TS.TYPE_GUARD">
@@ -1949,7 +1949,7 @@
     </option>
     <option name="Scala Predefined types">
       <value>
-        <option name="FOREGROUND" value="b1d0e6" />
+        <option name="FOREGROUND" value="cabae4" />
       </value>
     </option>
     <option name="Scala Type Alias" baseAttributes="" />
@@ -2004,7 +2004,7 @@
     </option>
     <option name="ReSharper.TYPE_PARAMETER_IDENTIFIER">
       <value>
-        <option name="FOREGROUND" value="b1d0e6" />
+        <option name="FOREGROUND" value="cabae4" />
         <option name="FONT_TYPE" value="2" />
       </value>
     </option>
@@ -2017,7 +2017,7 @@
     </option>
     <option name="ReSharper.STATIC_CLASS_IDENTIFIER">
       <value>
-        <option name="FOREGROUND" value="b1d0e6" />
+        <option name="FOREGROUND" value="cabae4" />
         <option name="FONT_TYPE" value="2" />
       </value>
     </option>
@@ -2075,7 +2075,7 @@
     </option>
     <option name="ReSharper.ASP_NET_DIRECTIVE_NAME">
       <value>
-        <option name="FOREGROUND" value="b1d0e6" />
+        <option name="FOREGROUND" value="cabae4" />
         <option name="FONT_TYPE" value="2" />
       </value>
     </option>
@@ -2110,7 +2110,7 @@
     </option>
     <option name="ReSharper.ASP_NET_MVC_VIEW_COMPONENT">
       <value>
-        <option name="FOREGROUND" value="b1d0e6" />
+        <option name="FOREGROUND" value="cabae4" />
         <option name="EFFECT_TYPE" value="1" />
       </value>
     </option>
