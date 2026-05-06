@@ -43,7 +43,7 @@
     "TabbedPane.selected": "#84afeb",
     "TabbedPane.hoverColor": "#a8c6f0",
     "TabbedPane.focusColor": "#84afeb",
-    "Tree.modifiedItemForeground": "#bba586",
+    "Tree.modifiedItemForeground": "#a89e5c",
     "ToolWindow.background": "#1e2235",
     "ToolWindow.Header.background": "#1e2235",
     "ToolWindow.Header.inactiveBackground": "#1e2235",

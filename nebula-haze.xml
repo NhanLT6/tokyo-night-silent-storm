@@ -17,7 +17,7 @@
   <colors>
     <!-- VCS gutter indicators -->
     <option name="ADDED_LINES_COLOR" value="79ad7b" />
-    <option name="MODIFIED_LINES_COLOR" value="bba586" />
+    <option name="MODIFIED_LINES_COLOR" value="a89e5c" />
     <option name="DELETED_LINES_COLOR" value="c7778a" />
     <option name="WHITESPACES_MODIFIED_LINES_COLOR" value="565f89" />
 
@@ -148,17 +148,17 @@
     <option name="FILESTATUS_ADDED" value="79ad7b" />
     <option name="FILESTATUS_COPIED" value="79ad7b" />
     <option name="FILESTATUS_DELETED" value="c7778a" />
-    <option name="FILESTATUS_MODIFIED" value="bba586" />
-    <option name="FILESTATUS_HIJACKED" value="bba586" />
+    <option name="FILESTATUS_MODIFIED" value="a89e5c" />
+    <option name="FILESTATUS_HIJACKED" value="a89e5c" />
     <option name="FILESTATUS_MERGED" value="7dcfff" />
     <option name="FILESTATUS_UNKNOWN" value="c7778a" />
     <option name="FILESTATUS_SWITCHED" value="c7778a" />
-    <option name="FILESTATUS_OBSOLETE" value="bba586" />
+    <option name="FILESTATUS_OBSOLETE" value="a89e5c" />
     <option name="FILESTATUS_SUPPRESSED" value="414868" />
-    <option name="FILESTATUS_NOT_CHANGED_IMMEDIATE" value="bba586" />
-    <option name="FILESTATUS_NOT_CHANGED_RECURSIVE" value="bba586" />
+    <option name="FILESTATUS_NOT_CHANGED_IMMEDIATE" value="a89e5c" />
+    <option name="FILESTATUS_NOT_CHANGED_RECURSIVE" value="a89e5c" />
     <option name="FILESTATUS_addedOutside" value="79ad7b" />
-    <option name="FILESTATUS_modifiedOutside" value="bba586" />
+    <option name="FILESTATUS_modifiedOutside" value="a89e5c" />
     <option name="FILESTATUS_changelistConflict" value="d8c383" />
     <option name="FILESTATUS_idea_filestatus_deleted_from_file_system" value="565f89" />
     <option name="FILESTATUS_idea_filestatus_ignored" value="c0caf5" />
@@ -1253,7 +1253,7 @@
     </option>
     <option name="GIT_TOOLBOX.CHANGED_COUNT_ATTRIBUTES">
       <value>
-        <option name="FOREGROUND" value="bba586" />
+        <option name="FOREGROUND" value="a89e5c" />
         <option name="FONT_TYPE" value="1" />
       </value>
     </option>
