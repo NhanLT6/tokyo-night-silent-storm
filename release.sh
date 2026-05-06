@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-LATEST=$(ls releases/*.jar | sort -V | tail -1)
+LATEST=$(ls releases/nebula-haze-*.jar | sort -V | tail -1)
 VERSION=$(basename "$LATEST" .jar | grep -oP '\d+\.\d+\.\d+')
 TAG="v$VERSION"
 

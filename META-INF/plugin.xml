@@ -1,16 +1,15 @@
 <idea-plugin>
-  <id>com.nhan.tokyo-night-silent-storm</id>
-  <name>Tokyo Night Silent Storm</name>
+  <id>com.nhan.nebula-haze</id>
+  <name>Nebula Haze</name>
   <version>1.0.0</version>
   <vendor email="letrongnhan1306@gmail.com">Nhan Le</vendor>
 
   <description><![CDATA[
-    A dark theme for JetBrains Rider based on Tokyo Night Storm with a softer touch.
-    Slightly lighter and warmer backgrounds reduce harsh contrast in daylight while
-    keeping the full Tokyo Night Storm syntax palette intact.
+    A cold, deep-space dark theme for JetBrains Rider built around muted nebula
+    syntax, dark chrome, and sparse warm stellar accents.
 
     Features:
-    - Silent Storm palette: lighter/warmer backgrounds than official Storm for comfortable daylight use
+    - Nebula Haze palette: cold blues and violets over deeper editor and chrome surfaces
     - Full ReSharper semantic highlighting: structs, enums, delegates, events, extension methods, generics
     - Dimmed inlay hints: subordinate to code, won't compete with LINQ chains or parameter lists
     - Extends Islands Dark — no chrome overrides that fight the IDE
@@ -25,7 +24,7 @@
   <depends>com.intellij.modules.platform</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <themeProvider id="com.nhan.tokyo-night-silent-storm" path="/tokyo-night-silent-storm.theme.json" />
-    <bundledColorScheme path="/tokyo-night-silent-storm" />
+    <themeProvider id="com.nhan.nebula-haze" path="/nebula-haze.theme.json" />
+    <bundledColorScheme path="/nebula-haze" />
   </extensions>
 </idea-plugin>

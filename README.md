@@ -1,8 +1,8 @@
-# Tokyo Night Silent Storm
+# Nebula Haze
 
-A dark theme for JetBrains Rider based on [Tokyo Night Storm](https://github.com/enkia/tokyo-night-vscode-theme), with softer backgrounds tuned for daylight use.
+A cold, deep-space dark theme for JetBrains Rider built around muted nebula syntax, dark chrome, and sparse warm stellar accents.
 
-**Silent Storm twist:** backgrounds are slightly lighter and warmer than official Storm, reducing harsh contrast without changing the palette feel. All syntax colors are pure Tokyo Night Storm.
+**Nebula Haze identity:** most syntax reads as cold mist and gas, while numbers and markup tags provide the only warm highlights.
 
 ![preview](preview.html)
 
@@ -17,22 +17,22 @@ A dark theme for JetBrains Rider based on [Tokyo Night Storm](https://github.com
 
 | Role | Color |
 |---|---|
-| Background | `#2a2d3e` |
-| Chrome | `#22253a` |
+| Background | `#22253a` |
+| Chrome | `#1a1d30` |
 | Foreground | `#c0caf5` |
-| Keywords | `#bb9af7` |
-| Functions | `#7aa2f7` |
-| Strings | `#9ece6a` |
-| Numbers | `#ff9e64` |
-| Types | `#2ac3de` |
+| Keywords | `#afa4e5` |
+| Functions | `#85a7f5` |
+| Strings | `#90d89f` |
+| Numbers | `#d8c383` |
+| Types | `#b1d0e6` |
 | Enums / Structs | `#73daca` |
-| Operators | `#89ddff` |
-| Parameters | `#e0af68` |
-| Comments | `#565f89` |
+| Operators | `#7ab8d8` |
+| Parameters | `#c6afa9` |
+| Comments | `#5e6590` |
 
 ## Install
 
-**From JetBrains Marketplace** *(once published)*: Settings → Plugins → search "Tokyo Night Silent Storm"
+**From JetBrains Marketplace** *(once published)*: Settings → Plugins → search "Nebula Haze"
 
 **From release JAR**: Settings → Plugins → ⚙ → Install Plugin from Disk → pick the `.jar`
 
@@ -40,7 +40,7 @@ A dark theme for JetBrains Rider based on [Tokyo Night Storm](https://github.com
 
 ```bash
 npm install
-node build.js        # outputs releases/tokyo-night-silent-storm-x.x.x.jar
+node build.js        # outputs releases/nebula-haze-x.x.x.jar
 ```
 
 Open `preview.html` in a browser to see all colors without installing.

@@ -2,53 +2,54 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Tokyo Night Silent Storm — Preview</title>
+  <title>Nebula Haze — Preview</title>
   <style>
     /* ── Palette variables ─────────────────────────────────────── */
     :root {
-      --bg-chrome:      #20243a;
-      --bg-panel:       #2c2f47;
-      --bg-caret-row:   #25293f;
-      --bg-selection:   #2d4f67;
-      --bg-razor:       #363b54;
-      --bg-card:        #2c2f47;
-      --border-island:  #2c2f47;
-      --border-inner:   #3a3f5d;
+      --bg-chrome:      #1a1d30;
+      --bg-panel:       #22253a;
+      --bg-caret-row:   #181a2c;
+      --bg-selection:   #3c3465;
+      --bg-razor:       #2a2e4a;
+      --bg-card:        #22253a;
+      --border-island:  #191c2e;
+      --border-inner:   #2a2e4a;
 
       --fg:             #c0caf5;
       --fg-dim:         #565f89;
-      --fg-line-num:    #3b3f5c;
+      --fg-line-num:    #2a2e48;
       --fg-line-active: #737aa2;
 
-      --accent:         #b8a4e8;
-      --accent-light:   #7dcfff;
+      --accent:         #84afeb;
+      --accent-light:   #a8c6f0;
 
-      --keyword:        #b8a4e8;
+      --keyword:        #afa4e5;
       --func:           #85a7f5;
-      --string:         #8fc472;
-      --number:         #d4936a;
-      --type:           #4dc4d8;
+      --string:         #90d89f;
+      --number:         #d8c383;
+      --type:           #b1d0e6;
       --enum:           #73daca;
       --comment:        #5e6590;
       --operator:       #7ab8d8;
       --local:          #a0c5e9;
-      --param:          #ccb0ba;
+      --param:          #c6afa9;
       --warm:           #c9a55a;
       --escape:         #7ab8d8;
-      --entity:         #d4936a;
-      --tag:            #e07891;
+      --entity:         #d8c383;
+      --tag:            #cc8ea5;
       --attr:           #7dcfff;
       --json-key:       #7dcfff;
       --yaml-key:       #7dcfff;
       --error:          #e07891;
       --warning:        #c9a55a;
-      --search-match:   #473f68;
-      --search-border:  #8c7ec0;
-      --search-current: #365a78;
-      --search-current-border: #85a7f5;
+      --vcs-modified:   #bba586;
+      --search-match:   #4a3e00;
+      --search-border:  #c9a55a;
+      --search-current: #0d4f48;
+      --search-current-border: #73daca;
 
       --inlay-fg:       #414868;
-      --inlay-bg:       #20243a;
+      --inlay-bg:       #1a1d30;
     }
 
     /* ── Reset / base ──────────────────────────────────────────── */
@@ -91,7 +92,7 @@
     }
     .ide-toolbar-dot:nth-child(1) { background: #e07891; }
     .ide-toolbar-dot:nth-child(2) { background: #c9a55a; }
-    .ide-toolbar-dot:nth-child(3) { background: #8fc472; }
+    .ide-toolbar-dot:nth-child(3) { background: #90d89f; }
     .ide-toolbar-title {
       flex: 1; text-align: center; color: var(--fg-dim); font-size: 12px;
       font-family: system-ui, sans-serif;
@@ -134,7 +135,7 @@
     }
     .ide-sidebar-item { padding: 3px 6px; color: var(--fg-dim); border-radius: 4px; }
     .ide-sidebar-item.active { color: var(--fg); background: var(--bg-selection); }
-    .ide-sidebar-item.modified { color: var(--accent-light); }
+    .ide-sidebar-item.modified { color: var(--vcs-modified); }
     .ide-sidebar-item.new { color: var(--string); }
     .ide-sidebar-item.deleted { color: var(--error); text-decoration: line-through; }
 
@@ -257,7 +258,7 @@
 </head>
 <body>
 
-<h1>Tokyo Night Silent Storm</h1>
+<h1>Nebula Haze</h1>
 <h2>Rider theme preview — open this file in a browser</h2>
 
 <!-- ── IDE mock ──────────────────────────────────────────────── -->
@@ -315,22 +316,22 @@
     <span>UTF-8</span>
     <span>C#</span>
     <span>Ln 3, Col 14</span>
-    <span style="margin-left:auto">Tokyo Night Silent Storm</span>
+    <span style="margin-left:auto">Nebula Haze</span>
   </div>
 </div>
 
 <!-- ── Palette ───────────────────────────────────────────────── -->
 <h3>Palette</h3>
 <div class="swatches">
-  <div class="swatch"><div class="swatch-dot" style="background:#b8a4e8"></div>keyword #b8a4e8</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#afa4e5"></div>keyword #afa4e5</div>
   <div class="swatch"><div class="swatch-dot" style="background:#85a7f5"></div>function #85a7f5</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#8fc472"></div>string #8fc472</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#d4936a"></div>number #d4936a</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#4dc4d8"></div>type #4dc4d8</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#90d89f"></div>string #90d89f</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#d8c383"></div>number #d8c383</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#b1d0e6"></div>type #b1d0e6</div>
   <div class="swatch"><div class="swatch-dot" style="background:#73daca"></div>enum/struct #73daca</div>
   <div class="swatch"><div class="swatch-dot" style="background:#7ab8d8"></div>operator #7ab8d8</div>
   <div class="swatch"><div class="swatch-dot" style="background:#a0c5e9"></div>local #a0c5e9</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#ccb0ba"></div>param #ccb0ba</div>
+  <div class="swatch"><div class="swatch-dot" style="background:#c6afa9"></div>param #c6afa9</div>
   <div class="swatch"><div class="swatch-dot" style="background:#c9a55a"></div>event/format #c9a55a</div>
   <div class="swatch"><div class="swatch-dot" style="background:#5e6590"></div>comment #5e6590</div>
   <div class="swatch"><div class="swatch-dot" style="background:#c0caf5"></div>fg #c0caf5</div>

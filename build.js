@@ -14,7 +14,7 @@ function nextVersion() {
   const MINOR_MAX = 10;
   const files = fs.readdirSync(releasesDir);
   const versions = files
-    .map(f => f.match(/^tokyo-night-silent-storm-(\d+)\.(\d+)\.(\d+)\.jar$/))
+    .map(f => f.match(/^nebula-haze-(\d+)\.(\d+)\.(\d+)\.jar$/))
     .filter(Boolean)
     .map(([, major, minor, patch]) => [+major, +minor, +patch]);
 
@@ -31,7 +31,7 @@ function nextVersion() {
 }
 
 const version = nextVersion();
-const outputFilename = `tokyo-night-silent-storm-${version}.jar`;
+const outputFilename = `nebula-haze-${version}.jar`;
 const outputPath = path.join(releasesDir, outputFilename);
 
 const output = fs.createWriteStream(outputPath);
@@ -47,11 +47,11 @@ console.log('Building theme JAR...');
 archive.directory('META-INF/', 'META-INF');
 console.log('  Added META-INF/');
 
-archive.file('tokyo-night-silent-storm.xml', { name: 'tokyo-night-silent-storm.xml' });
-console.log('  Added tokyo-night-silent-storm.xml');
+archive.file('nebula-haze.xml', { name: 'nebula-haze.xml' });
+console.log('  Added nebula-haze.xml');
 
-archive.file('tokyo-night-silent-storm.theme.json', { name: 'tokyo-night-silent-storm.theme.json' });
-console.log('  Added tokyo-night-silent-storm.theme.json');
+archive.file('nebula-haze.theme.json', { name: 'nebula-haze.theme.json' });
+console.log('  Added nebula-haze.theme.json');
 
 output.on('close', () => {
   console.log(`\nTheme JAR created successfully!`);

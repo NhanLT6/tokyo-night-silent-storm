@@ -1,7 +1,7 @@
 {
-  "name": "tokyo-night-silent-storm",
+  "name": "nebula-haze",
   "version": "1.0.0",
-  "description": "Tokyo Night Silent Storm - dark theme for JetBrains Rider",
+  "description": "Nebula Haze - dark theme for JetBrains Rider",
   "license": "MIT",
   "scripts": {
     "build": "node build.js",
