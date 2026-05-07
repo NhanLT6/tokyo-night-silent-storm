@@ -12,7 +12,7 @@
 |------|-----|-------|
 | Background | `21243a` | Editor, gutter, console |
 | Plain text / default identifier | `c0caf5` | HSL 229°, 73%, 86% — the whisper anchor; also used for local variables (no semantic color) |
-| Comments | `7880a8` | Intentionally muted |
+| Comments | `606480` | Intentionally muted |
 | Inlay hints | `565f89` | Dimmer than comments |
 | Chrome (borders, guides) | `2a2e48` | Indent guides, margins |
 | Chrome (mid) | `414868` | Gutter annotations, diagram borders |
@@ -26,7 +26,7 @@
 | Level | Hex | HSL (approx) | Used for |
 |-------|-----|--------------|---------|
 | dim | `7494c8` | 222°, 44%, 62% | Scrollbar thumb (rest), code vision dim, string escape, YAML list scalar |
-| mid | `8aabe6` | 222°, 62%, 72% | Function declaration/call, instance method, static method, extension method, CSS property name, JSON/YAML property key, HTML/XML attribute name |
+| mid | `8aabe6` | 222°, 62%, 72% | Function declaration/call, instance method, static method, extension method, CSS property name, JSON/YAML property key |
 | bright | `a5bcf0` | 222°, 72%, 79% | Annotation, metadata, hyperlink, tab underline, bookmark, scrollbar hover, code vision hovered |
 
 ### Violet (~257°)
@@ -35,8 +35,8 @@
 |-------|-----|--------------|---------|
 | whisper | `c2c0e8` | 245°, 45%, 83% | TS type parameter, annotation attribute name |
 | dim | `9480c8` | 257°, 40%, 65% | Template variable |
-| mid | `b09ce8` | 256°, 62%, 76% | Keyword, predefined symbol, delegate, JS if/else/try/yield/module keyword |
-| bright | `c9b6ee` | 263°, 52%, 82% | Class name, abstract class, class reference, typedef, static class, namespace, type parameter, Scala predefined, Razor/ASP directive |
+| mid | `c498ff` | 257°, 100%, 80% | Keyword, predefined symbol, delegate, JS if/else/try/yield/module keyword |
+| bright | `dbbeff` | 263°, 100%, 87% | Class name, abstract class, class reference, typedef, static class, namespace, type parameter, Scala predefined, Razor/ASP directive |
 
 ### Teal (~170°)
 
@@ -44,22 +44,22 @@
 |-------|-----|--------------|---------|
 | dim | `5a9e94` | 174°, 28%, 48% | Reserved |
 | mid | `6ec4b6` | 173°, 42%, 60% | Constant, enum identifier, enum member, struct identifier (+ underline) |
-| bright | `8fd4c8` | 173°, 48%, 69% | Parameter, reassigned parameter, JS parameter, HTTP request parameter, anonymous class parameter, protocol reference, list/map conversion |
+| bright | `8fd4c8` | 173°, 48%, 69% | Parameter, reassigned parameter, JS parameter, HTTP request parameter, anonymous class parameter, protocol reference, list/map conversion; also HTML/XML/JSX/Vue attribute names |
 
 ### Green (~138°)
 
 | Level | Hex | HSL (approx) | Used for |
 |-------|-----|--------------|---------|
 | dim | `6a9e78` | 138°, 20%, 52% | Reserved |
-| mid | `8ab896` | 138°, 26%, 63% | Interface declaration |
-| bright | `9fd4ae` | 138°, 40%, 73% | String literal, CSS property value, JS regexp/module name, HTTP input, git-added gutter |
+| mid | `96cc9e` | 138°, 34%, 70% | Interface declaration |
+| bright | `88dda0` | 142°, 53%, 70% | String literal, CSS property value, JS regexp/module name, HTTP input, git-added gutter |
 
 ### Pink (~338°)
 
 | Level | Hex | HSL (approx) | Used for |
 |-------|-----|--------------|---------|
 | dim | `b07888` | 342°, 22%, 58% | Reserved |
-| mid | `cc8ea5` | 338°, 34%, 68% | HTML/XML/CSS/Razor tag name |
+| mid | `e888c0` | 318°, 76%, 73% | HTML/XML/CSS/Razor tag name (hot rose — appears infrequently, serves as energetic accent) |
 | bright | `e0aabf` | 338°, 52%, 77% | Git-deleted gutter |
 
 ### Sand (~57°, cool — no warm/orange cast)
