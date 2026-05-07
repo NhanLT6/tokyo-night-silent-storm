@@ -34,7 +34,7 @@
 
 | Level | Hex | HSL (approx) | Used for |
 |-------|-----|--------------|---------|
-| whisper | `c2c0e8` | 245°, 45%, 83% | Parameter, reassigned parameter, JS parameter, TS type parameter, annotation attribute name |
+| whisper | `c2c0e8` | 245°, 45%, 83% | TS type parameter, annotation attribute name |
 | dim | `9480c8` | 257°, 40%, 65% | Template variable |
 | mid | `b09ce8` | 256°, 62%, 76% | Keyword, predefined symbol, delegate, JS if/else/try/yield/module keyword |
 | bright | `c9b6ee` | 263°, 52%, 82% | Class name, abstract class, class reference, typedef, static class, namespace, type parameter, Scala predefined, Razor/ASP directive |
@@ -51,6 +51,7 @@
 
 | Level | Hex | HSL (approx) | Used for |
 |-------|-----|--------------|---------|
+| whisper | `c4e2db` | 167°, 34%, 83% | Parameter, reassigned parameter, JS parameter, HTTP request parameter, anonymous class parameter |
 | dim | `6a9e78` | 138°, 20%, 52% | Reserved |
 | mid | `8ab896` | 138°, 26%, 63% | Interface declaration |
 | bright | `9fd4ae` | 138°, 40%, 73% | String literal, CSS property value, JS regexp/module name, HTTP input, git-added gutter |

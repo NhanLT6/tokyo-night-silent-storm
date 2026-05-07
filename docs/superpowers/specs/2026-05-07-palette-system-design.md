@@ -74,7 +74,7 @@ Background: `21243a`
 
 | Level | Hex | HSL (approx) | Primary uses |
 |-------|-----|--------------|-------------|
-| whisper | `c2c0e8` | 245°, 45%, 83% | Parameter, type parameter |
+| whisper | `c2c0e8` | 245°, 45%, 83% | TS type parameter, annotation attribute name |
 | dim | `9480c8` | 257°, 40%, 65% | Template variable (dim) |
 | mid | `b09ce8` | 256°, 62%, 76% | Keyword, predefined symbol, delegate, JS module keyword, JS if/else/try/yield |
 | bright | `c9b6ee` | 263°, 52%, 82% | Class name, abstract class, interface reference, typedef, static class, namespace, type parameter (bold), Razor/ASP directive |
@@ -93,6 +93,7 @@ Note: Namespace uses the same slot as class (violet-bright). Visual distinction 
 
 | Level | Hex | HSL (approx) | Primary uses |
 |-------|-----|--------------|-------------|
+| whisper | `c4e2db` | 167°, 34%, 83% | Parameter, reassigned parameter, JS parameter, HTTP request parameter, anonymous class parameter |
 | dim | `6a9e78` | 138°, 20%, 52% | Reserved (dim green accents) |
 | mid | `8ab896` | 138°, 26%, 63% | Interface declaration |
 | bright | `9fd4ae` | 138°, 40%, 73% | String literal, CSS property value, JS regexp, JS module name, git-added gutter |
@@ -174,7 +175,8 @@ These colors have strong semantic/conventional meaning and are not governed by t
 | Old hex | Tokens | New hex | New slot |
 |---------|--------|---------|----------|
 | `a0c5e9` | Local variable, reassigned local variable, JS local variable, JS instance member variable | `bcc4e6` | blue-whisper |
-| `d0cdd1` | Parameter, reassigned parameter, JS parameter, TS type parameter, annotation attribute name | `c2c0e8` | violet-whisper |
+| `d0cdd1` | Parameter, reassigned parameter, JS parameter, HTTP request parameter, anonymous class parameter | `c4e2db` | green-whisper |
+| `d0cdd1` | TS type parameter, annotation attribute name | `c2c0e8` | violet-whisper |
 
 ### Changed: strings and green family
 
