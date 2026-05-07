@@ -11,7 +11,7 @@
 | Role | Hex | Notes |
 |------|-----|-------|
 | Background | `21243a` | Editor, gutter, console |
-| Plain text / default identifier | `c0caf5` | HSL 229°, 73%, 86% — the whisper anchor |
+| Plain text / default identifier | `c0caf5` | HSL 229°, 73%, 86% — the whisper anchor; also used for local variables (no semantic color) |
 | Comments | `7880a8` | Intentionally muted |
 | Inlay hints | `565f89` | Dimmer than comments |
 | Chrome (borders, guides) | `2a2e48` | Indent guides, margins |
@@ -25,7 +25,6 @@
 
 | Level | Hex | HSL (approx) | Used for |
 |-------|-----|--------------|---------|
-| whisper | `bcc4e6` | 222°, 48%, 82% | Local variable, mutable local var, JS local var, JS instance member var |
 | dim | `7494c8` | 222°, 44%, 62% | Scrollbar thumb (rest), code vision dim, string escape, YAML list scalar |
 | mid | `8aabe6` | 222°, 62%, 72% | Function declaration/call, instance method, static method, extension method, CSS property name, JSON/YAML property key, HTML/XML attribute name |
 | bright | `a5bcf0` | 222°, 72%, 79% | Annotation, metadata, hyperlink, tab underline, bookmark, scrollbar hover, code vision hovered |
@@ -45,13 +44,12 @@
 |-------|-----|--------------|---------|
 | dim | `5a9e94` | 174°, 28%, 48% | Reserved |
 | mid | `6ec4b6` | 173°, 42%, 60% | Constant, enum identifier, enum member, struct identifier (+ underline) |
-| bright | `8fd4c8` | 173°, 48%, 69% | Protocol reference, list/map conversion |
+| bright | `8fd4c8` | 173°, 48%, 69% | Parameter, reassigned parameter, JS parameter, HTTP request parameter, anonymous class parameter, protocol reference, list/map conversion |
 
 ### Green (~138°)
 
 | Level | Hex | HSL (approx) | Used for |
 |-------|-----|--------------|---------|
-| whisper | `c4e2db` | 167°, 34%, 83% | Parameter, reassigned parameter, JS parameter, HTTP request parameter, anonymous class parameter |
 | dim | `6a9e78` | 138°, 20%, 52% | Reserved |
 | mid | `8ab896` | 138°, 26%, 63% | Interface declaration |
 | bright | `9fd4ae` | 138°, 40%, 73% | String literal, CSS property value, JS regexp/module name, HTTP input, git-added gutter |
