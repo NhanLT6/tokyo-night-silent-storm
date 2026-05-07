@@ -33,7 +33,7 @@
 
 | Level | Hex | HSL (approx) | Used for |
 |-------|-----|--------------|---------|
-| whisper | `c2c0e8` | 245°, 45%, 83% | TS type parameter, annotation attribute name |
+| whisper | `c2c0e8` | 245°, 45%, 83% | Parameter, reassigned parameter, JS/HTTP parameter, anonymous class parameter, TS type parameter, annotation attribute name |
 | dim | `9480c8` | 257°, 40%, 65% | Template variable |
 | mid | `c498ff` | 257°, 100%, 80% | Keyword, predefined symbol, delegate, JS if/else/try/yield/module keyword |
 | bright | `dbbeff` | 263°, 100%, 87% | Class name, abstract class, class reference, typedef, static class, namespace, type parameter, Scala predefined, Razor/ASP directive; also HTML/XML/CSS/JSX/Vue tag name |
@@ -44,7 +44,7 @@
 |-------|-----|--------------|---------|
 | dim | `5a9e94` | 174°, 28%, 48% | Reserved |
 | mid | `6ec4b6` | 173°, 42%, 60% | Constant, enum identifier, enum member, struct identifier (+ underline) |
-| bright | `8fd4c8` | 173°, 48%, 69% | Parameter, reassigned parameter, JS parameter, HTTP request parameter, anonymous class parameter, protocol reference, list/map conversion; also HTML/XML/JSX/Vue attribute names |
+| bright | `8fd4c8` | 173°, 48%, 69% | Protocol reference, list/map conversion, CSS class name, HTML/XML/JSX/Vue attribute names, event identifier, format string item |
 
 ### Green (~138°)
 
