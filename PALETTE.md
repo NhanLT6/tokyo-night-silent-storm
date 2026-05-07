@@ -36,7 +36,7 @@
 | whisper | `c2c0e8` | 245°, 45%, 83% | TS type parameter, annotation attribute name |
 | dim | `9480c8` | 257°, 40%, 65% | Template variable |
 | mid | `c498ff` | 257°, 100%, 80% | Keyword, predefined symbol, delegate, JS if/else/try/yield/module keyword |
-| bright | `dbbeff` | 263°, 100%, 87% | Class name, abstract class, class reference, typedef, static class, namespace, type parameter, Scala predefined, Razor/ASP directive |
+| bright | `dbbeff` | 263°, 100%, 87% | Class name, abstract class, class reference, typedef, static class, namespace, type parameter, Scala predefined, Razor/ASP directive; also HTML/XML/CSS/JSX/Vue tag name |
 
 ### Teal (~170°)
 
@@ -59,7 +59,7 @@
 | Level | Hex | HSL (approx) | Used for |
 |-------|-----|--------------|---------|
 | dim | `b07888` | 342°, 22%, 58% | Reserved |
-| mid | `e888c0` | 318°, 76%, 73% | HTML/XML/CSS/Razor tag name (hot rose — appears infrequently, serves as energetic accent) |
+| mid | `e888c0` | 318°, 76%, 73% | Deferred — no current syntax assignment (was HTML/XML tag name; moved to violet-bright for unified JSX/class color) |
 | bright | `e0aabf` | 338°, 52%, 77% | Git-deleted gutter |
 
 ### Sand (~57°, cool — no warm/orange cast)

@@ -302,7 +302,7 @@
     </option>
     <option name="DEFAULT_TAG">
       <value>
-        <option name="FOREGROUND" value="e888c0" />
+        <option name="FOREGROUND" value="dbbeff" />
       </value>
     </option>
     <option name="TYPEDEF">
@@ -1409,7 +1409,7 @@
     </option>
     <option name="CSS.TAG_NAME">
       <value>
-        <option name="FOREGROUND" value="e888c0" />
+        <option name="FOREGROUND" value="dbbeff" />
       </value>
     </option>
     <option name="CSS.URL">
@@ -1432,7 +1432,7 @@
     <!-- ── HTML ───────────────────────────────────────────────── -->
     <option name="HTML_TAG_NAME">
       <value>
-        <option name="FOREGROUND" value="e888c0" />
+        <option name="FOREGROUND" value="dbbeff" />
       </value>
     </option>
     <option name="HTML_ATTRIBUTE_NAME">
@@ -1453,7 +1453,7 @@
     <!-- ── XML ────────────────────────────────────────────────── -->
     <option name="XML_TAG_NAME">
       <value>
-        <option name="FOREGROUND" value="e888c0" />
+        <option name="FOREGROUND" value="dbbeff" />
       </value>
     </option>
     <option name="XML_ATTRIBUTE_NAME">
@@ -1463,7 +1463,7 @@
     </option>
     <option name="XML_CUSTOM_TAG_NAME">
       <value>
-        <option name="FOREGROUND" value="e888c0" />
+        <option name="FOREGROUND" value="dbbeff" />
       </value>
     </option>
     <option name="XML_ENTITY_REFERENCE">
@@ -1758,7 +1758,7 @@
     </option>
     <option name="MARKDOWN_INLINE_HTML">
       <value>
-        <option name="FOREGROUND" value="e888c0" />
+        <option name="FOREGROUND" value="dbbeff" />
         <option name="EFFECT_TYPE" value="5" />
       </value>
     </option>
@@ -2067,7 +2067,7 @@
     <!-- ASP.NET / Razor -->
     <option name="ReSharper.ASP_NET_TAG_NAME">
       <value>
-        <option name="FOREGROUND" value="e888c0" />
+        <option name="FOREGROUND" value="dbbeff" />
       </value>
     </option>
     <option name="ReSharper.ASP_NET_ATTRIBUTE_NAME">
@@ -2135,7 +2135,7 @@
     </option>
     <option name="ReSharper.ASP_NET_RAZOR_TAG_NAME">
       <value>
-        <option name="FOREGROUND" value="e888c0" />
+        <option name="FOREGROUND" value="dbbeff" />
       </value>
     </option>
     <option name="ReSharper.ASP_NET_RAZOR_ATTRIBUTE_NAME">
