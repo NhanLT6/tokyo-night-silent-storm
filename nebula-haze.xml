@@ -457,7 +457,7 @@
     </option>
     <option name="ANNOTATION_ATTRIBUTE_NAME_ATTRIBUTES">
       <value>
-        <option name="FOREGROUND" value="c2c0e8" />
+        <option name="FOREGROUND" value="bdd8e8" />
       </value>
     </option>
     <option name="Annotation">
@@ -1621,7 +1621,7 @@
     </option>
     <option name="TS.TYPE_PARAMETER">
       <value>
-        <option name="FOREGROUND" value="c2c0e8" />
+        <option name="FOREGROUND" value="bdd8e8" />
       </value>
     </option>
 
