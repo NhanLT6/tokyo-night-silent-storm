@@ -1,503 +1,912 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Nebula Haze — Preview</title>
-  <style>
-    /* ── Palette variables ─────────────────────────────────────── */
-    :root {
-      --bg-chrome:      #1a1d30;
-      --bg-panel:       #22253a;
-      --bg-caret-row:   #181a2c;
-      --bg-selection:   #3c3465;
-      --bg-razor:       #2a2e4a;
-      --bg-card:        #22253a;
-      --border-island:  #191c2e;
-      --border-inner:   #2a2e4a;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nebula Haze — Preview</title>
+<script>
+// ── PALETTE: slot → hex (source of truth) ───────────────────────────────────
+const PALETTE = {
+  'blue-dim':       '#7494c8',
+  'blue-mid':       '#8aabe6',
+  'blue-bright':    '#a5bcf0',
+  'violet-whisper': '#c2c0e8',
+  'violet-dim':     '#9480c8',
+  'violet-mid':     '#c498ff',
+  'violet-bright':  '#dbbeff',
+  'teal-whisper':   '#bdd8e8',
+  'teal-dim':       '#5a9e94',
+  'teal-mid':       '#6ec4b6',
+  'teal-bright':    '#8fd4c8',
+  'green-dim':      '#6a9e78',
+  'green-mid':      '#96cc9e',
+  'green-bright':   '#88dda0',
+  'pink-dim':       '#b07888',
+  'pink-mid':       '#e888c0',
+  'pink-bright':    '#e0aabf',
+  'sand-dim':       '#a8a578',
+  'sand-mid':       '#c5c28a',
+  'sand-bright':    '#d4d07a',
+  'orange':         '#e09a68',
+  'plain':          '#c0caf5',
+  'comment':        '#606480',
+};
 
-      --fg:             #c0caf5;
-      --fg-dim:         #565f89;
-      --fg-line-num:    #2a2e48;
-      --fg-line-active: #737aa2;
+// ── TOKEN_SLOTS: css-class suffix → palette slot ─────────────────────────────
+const TOKEN_SLOTS = {
+  kw:   'violet-mid',
+  cls:  'violet-bright',
+  fn:   'blue-mid',
+  pm:   'teal-whisper',
+  str:  'green-bright',
+  num:  'sand-mid',
+  cmt:  'comment',
+  cst:  'teal-mid',
+  ifc:  'green-mid',
+  ann:  'blue-bright',
+  op:   'orange',
+  attr: 'teal-bright',
+  tag:  'violet-bright',
+  tp:   'violet-bright',
+  wtp:  'violet-whisper',
+  esc:  'blue-dim',
+  pl:   'plain',
+  tmpl: 'violet-dim',
+};
 
-      --accent:         #84afeb;
-      --accent-light:   #a8c6f0;
+// ── TOKEN_LABELS: css-class suffix → human label ─────────────────────────────
+const TOKEN_LABELS = {
+  kw:   'Keyword',
+  cls:  'Class / Type / Namespace',
+  fn:   'Function / Method',
+  pm:   'Parameter',
+  str:  'String',
+  num:  'Number',
+  cmt:  'Comment',
+  cst:  'Constant / Enum member',
+  ifc:  'Interface',
+  ann:  'Annotation / Attribute',
+  op:   'Operator / Punctuation',
+  attr: 'HTML · JSX · Vue attribute',
+  tag:  'Tag name',
+  tp:   'Type parameter (C#)',
+  wtp:  'Type parameter (TS)',
+  esc:  'String escape',
+  pl:   'Local variable / identifier',
+  tmpl: 'Template variable',
+};
 
-      --keyword:        #afa4e5;
-      --func:           #85a7f5;
-      --string:         #90d89f;
-      --number:         #d8c383;
-      --type:           #b1d0e6;
-      --enum:           #73daca;
-      --comment:        #5e6590;
-      --operator:       #7ab8d8;
-      --local:          #a0c5e9;
-      --param:          #c6afa9;
-      --warm:           #c9a55a;
-      --escape:         #7ab8d8;
-      --entity:         #d8c383;
-      --tag:            #cc8ea5;
-      --attr:           #7dcfff;
-      --json-key:       #7dcfff;
-      --yaml-key:       #7dcfff;
-      --error:          #e07891;
-      --warning:        #c9a55a;
-      --vcs-modified:   #bba586;
-      --search-match:   #4a3e00;
-      --search-border:  #c9a55a;
-      --search-current: #0d4f48;
-      --search-current-border: #73daca;
+// ── SLOT_TOKENS: slot → list of token keys that use it ───────────────────────
+const SLOT_TOKENS = {};
+for (const [k, slot] of Object.entries(TOKEN_SLOTS)) {
+  (SLOT_TOKENS[slot] = SLOT_TOKENS[slot] || []).push(k);
+}
 
-      --inlay-fg:       #414868;
-      --inlay-bg:       #1a1d30;
-    }
+// ── Apply palette to CSS custom properties ────────────────────────────────────
+function applyPalette(pal) {
+  const root = document.documentElement;
+  for (const [slot, hex] of Object.entries(pal)) {
+    root.style.setProperty(`--c-${slot}`, hex);
+  }
+}
+</script>
+<style>
+/* ── Reset ──────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── Reset / base ──────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── Token colors via CSS custom properties ──────────────────────────────────
+   Changing a var updates every span referencing it instantly.              */
+.t-kw   { color: var(--c-violet-mid); }
+.t-cls  { color: var(--c-violet-bright); }
+.t-fn   { color: var(--c-blue-mid); }
+.t-pm   { color: var(--c-teal-whisper); }
+.t-str  { color: var(--c-green-bright); }
+.t-num  { color: var(--c-sand-mid); }
+.t-cmt  { color: var(--c-comment); font-style: italic; }
+.t-cst  { color: var(--c-teal-mid); }
+.t-ifc  { color: var(--c-green-mid); }
+.t-ann  { color: var(--c-blue-bright); }
+.t-op   { color: var(--c-orange); }
+.t-attr { color: var(--c-teal-bright); }
+.t-tag  { color: var(--c-violet-bright); }
+.t-tp   { color: var(--c-violet-bright); }
+.t-wtp  { color: var(--c-violet-whisper); }
+.t-esc  { color: var(--c-blue-dim); }
+.t-pl   { color: var(--c-plain); }
+.t-tmpl { color: var(--c-violet-dim); }
 
-    body {
-      background: var(--bg-chrome);
-      color: var(--fg);
-      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-      padding: 20px;
-    }
+/* ── Layout ─────────────────────────────────────────────────────────────────── */
+body {
+  background: #12131f;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  color: var(--c-plain);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-    h1 { font-size: 18px; font-weight: 600; margin-bottom: 4px; color: var(--fg); font-family: system-ui, sans-serif; }
-    h2 { font-size: 11px; font-weight: 400; color: var(--fg-dim); margin-bottom: 20px; font-family: system-ui, sans-serif; }
-    h3 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em;
-         color: var(--fg-dim); margin-bottom: 8px; font-family: system-ui, sans-serif; }
+.shell {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  border-top: 1px solid #2a2e48;
+}
 
-    /* ── IDE chrome mock ──────────────────────────────────────── */
-    .ide-mock {
-      background: var(--bg-chrome);
-      border-radius: 8px;
-      overflow: hidden;
-      margin-bottom: 24px;
-      border: 1px solid var(--border-island);
-    }
+/* ── Sidebar ─────────────────────────────────────────────────────────────────── */
+.sidebar {
+  width: 252px;
+  flex-shrink: 0;
+  background: #161829;
+  border-right: 1px solid #2a2e48;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-    .ide-toolbar {
-      background: var(--bg-chrome);
-      height: 38px;
-      display: flex;
-      align-items: center;
-      padding: 0 12px;
-      gap: 8px;
-      border-bottom: 1px solid var(--border-inner);
-    }
-    .ide-toolbar-dot {
-      width: 12px; height: 12px; border-radius: 50%;
-    }
-    .ide-toolbar-dot:nth-child(1) { background: #e07891; }
-    .ide-toolbar-dot:nth-child(2) { background: #c9a55a; }
-    .ide-toolbar-dot:nth-child(3) { background: #90d89f; }
-    .ide-toolbar-title {
-      flex: 1; text-align: center; color: var(--fg-dim); font-size: 12px;
-      font-family: system-ui, sans-serif;
-    }
+.sb-header {
+  padding: 11px 14px 10px;
+  border-bottom: 1px solid #2a2e48;
+  flex-shrink: 0;
+}
+.sb-header-name { font-size: 13px; font-weight: 600; color: var(--c-plain); }
+.sb-header-sub  { font-size: 11px; color: var(--c-comment); margin-top: 1px; }
 
-    .ide-tab-bar {
-      background: var(--bg-panel);
-      display: flex;
-      align-items: stretch;
-      border-bottom: 1px solid var(--border-inner);
-      height: 32px;
-    }
-    .ide-tab {
-      padding: 0 16px;
-      display: flex;
-      align-items: center;
-      font-size: 12px;
-      color: var(--fg-dim);
-      border-right: 1px solid var(--border-inner);
-      cursor: default;
-      font-family: system-ui, sans-serif;
-    }
-    .ide-tab.active {
-      color: var(--fg);
-      border-bottom: 2px solid var(--accent);
-      margin-bottom: -1px;
-    }
+.sb-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: #2a2e48 transparent;
+}
 
-    .ide-body {
-      display: flex;
-      height: 200px;
-    }
-    .ide-sidebar {
-      background: var(--bg-chrome);
-      width: 200px;
-      border-right: 1px solid var(--border-inner);
-      padding: 8px;
-      font-size: 12px;
-      font-family: system-ui, sans-serif;
-    }
-    .ide-sidebar-item { padding: 3px 6px; color: var(--fg-dim); border-radius: 4px; }
-    .ide-sidebar-item.active { color: var(--fg); background: var(--bg-selection); }
-    .ide-sidebar-item.modified { color: var(--vcs-modified); }
-    .ide-sidebar-item.new { color: var(--string); }
-    .ide-sidebar-item.deleted { color: var(--error); text-decoration: line-through; }
+.sb-section-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #414868;
+  margin-bottom: 8px;
+}
 
-    .ide-editor {
-      flex: 1;
-      background: var(--bg-panel);
-      padding: 10px 0;
-      overflow: hidden;
-      position: relative;
-    }
-    .ide-code-line {
-      display: flex;
-      align-items: baseline;
-      padding: 0 12px;
-      white-space: pre;
-    }
-    .ide-code-line.caret { background: var(--bg-caret-row); }
-    .ide-code-line.selected { background: var(--bg-selection); }
-    .line-num {
-      width: 28px;
-      text-align: right;
-      margin-right: 16px;
-      color: var(--fg-line-num);
-      user-select: none;
-      font-size: 12px;
-      flex-shrink: 0;
-    }
-    .ide-code-line.caret .line-num { color: var(--fg-line-active); }
+/* Palette rows */
+.family-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+.family-name { font-size: 10px; color: var(--c-comment); width: 46px; flex-shrink: 0; padding-top: 4px; }
+.swatch-group { display: flex; gap: 4px; }
+.swatch-col { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.07);
+  transition: transform 0.1s, border-color 0.1s;
+}
+.swatch:hover { border-color: rgba(255,255,255,0.4); transform: scale(1.12); }
+.swatch.active { border-color: var(--c-blue-bright); border-width: 2px; }
+.swatch-label { font-size: 7px; color: #414868; }
 
-    .ide-status {
-      background: var(--bg-chrome);
-      height: 22px;
-      display: flex;
-      align-items: center;
-      padding: 0 12px;
-      gap: 16px;
-      font-size: 11px;
-      color: var(--fg-dim);
-      border-top: 1px solid var(--border-inner);
-      font-family: system-ui, sans-serif;
-    }
-    .ide-status-accent { color: var(--accent); }
+/* Inspector */
+.inspector {
+  background: #1e2035;
+  border: 1px solid #2a2e48;
+  border-radius: 5px;
+  padding: 10px 12px;
+  min-height: 80px;
+}
+.inspector-empty { font-size: 11px; color: #414868; }
+.inspector-token-label { font-size: 10px; color: var(--c-comment); text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 2px; }
+.inspector-slot { font-size: 13px; color: var(--c-blue-bright); margin-bottom: 9px; }
+.color-row { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
+.color-picker {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  padding: 0;
+  cursor: pointer;
+  background: none;
+  flex-shrink: 0;
+}
+.color-picker::-webkit-color-swatch-wrapper { padding: 0; border-radius: 3px; }
+.color-picker::-webkit-color-swatch { border: none; border-radius: 3px; }
+.color-picker::-moz-color-swatch { border: none; border-radius: 3px; }
+.hex-input {
+  flex: 1;
+  background: #21243a;
+  border: 1px solid #2a2e48;
+  border-radius: 3px;
+  color: var(--c-plain);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  padding: 4px 8px;
+  outline: none;
+}
+.hex-input:focus { border-color: var(--c-blue-bright); }
+.also-used { font-size: 11px; color: #414868; line-height: 1.5; }
+.also-used b { color: var(--c-comment); font-weight: normal; }
 
-    /* ── Palette swatch row ──────────────────────────────────────── */
-    .swatches {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 24px;
-    }
-    .swatch {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      font-family: system-ui, sans-serif;
-      color: var(--fg-dim);
-    }
-    .swatch-dot {
-      width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0;
-    }
+/* Changes panel */
+.changes-panel {
+  background: #1a1c30;
+  border: 1px solid #2a2e48;
+  border-radius: 5px;
+  padding: 10px 12px;
+  display: none;
+}
+.changes-panel.visible { display: block; }
+.changes-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
+.changes-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--c-blue-bright); display: inline-block; margin-right: 5px; }
+.changes-count { font-size: 12px; color: var(--c-blue-bright); }
+.undo-redo { display: flex; gap: 3px; }
+.icon-btn {
+  background: #2a2e48;
+  border: none;
+  border-radius: 3px;
+  color: var(--c-plain);
+  font-size: 13px;
+  width: 26px;
+  height: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-btn:disabled { color: #414868; cursor: default; }
+.change-list { display: flex; flex-direction: column; gap: 3px; margin-bottom: 9px; }
+.change-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 7px;
+  background: #21243a;
+  border-radius: 3px;
+  font-size: 10px;
+}
+.change-slot { color: var(--c-comment); width: 84px; flex-shrink: 0; font-family: monospace; }
+.ch-swatch { width: 11px; height: 11px; border-radius: 2px; flex-shrink: 0; }
+.ch-arrow { color: #414868; }
+.ch-hex { flex: 1; font-family: monospace; }
+.ch-revert { color: #414868; cursor: pointer; padding: 0 2px; line-height: 1; font-size: 12px; }
+.ch-revert:hover { color: #e07891; }
+.changes-actions { display: flex; gap: 5px; }
+.act-btn {
+  flex: 1;
+  background: #2a2e48;
+  border: none;
+  border-radius: 3px;
+  color: var(--c-blue-bright);
+  font-size: 11px;
+  padding: 5px 4px;
+  cursor: pointer;
+  text-align: center;
+}
+.act-btn.danger { color: var(--c-comment); }
+.act-btn.danger:hover { color: #e07891; }
 
-    /* ── Code cards ───────────────────────────────────────────── */
-    .card {
-      background: var(--bg-card);
-      border-radius: 6px;
-      margin-bottom: 20px;
-      overflow: hidden;
-      border: 1px solid var(--border-island);
-    }
-    .card-header {
-      background: var(--bg-chrome);
-      padding: 6px 14px;
-      font-size: 11px;
-      color: var(--fg-dim);
-      border-bottom: 1px solid var(--border-inner);
-      font-family: system-ui, sans-serif;
-      display: flex;
-      justify-content: space-between;
-    }
-    .card-body { padding: 14px; overflow-x: auto; }
-    pre { margin: 0; white-space: pre; }
+/* ── Main area ───────────────────────────────────────────────────────────────── */
+.main { flex: 1; display: flex; flex-direction: column; background: #21243a; overflow: hidden; }
 
-    /* ── Inlay hint ───────────────────────────────────────────── */
-    .inlay {
-      display: inline-block;
-      background: var(--inlay-bg);
-      color: var(--inlay-fg);
-      border-radius: 3px;
-      padding: 0 4px;
-      font-size: 11px;
-      vertical-align: baseline;
-      line-height: 1.4;
-    }
+.lang-tabs {
+  display: flex;
+  background: #1a1d2e;
+  border-bottom: 1px solid #2a2e48;
+  padding: 0 16px;
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.lang-tabs::-webkit-scrollbar { display: none; }
+.tab {
+  font-size: 12px;
+  padding: 9px 14px;
+  color: var(--c-comment);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  white-space: nowrap;
+  user-select: none;
+}
+.tab:hover { color: var(--c-plain); }
+.tab.active { color: var(--c-plain); border-bottom-color: var(--c-blue-bright); }
 
-    /* ── Syntax token classes ──────────────────────────────────── */
-    .kw  { color: var(--keyword); font-style: italic; }
-    .fn  { color: var(--func); }
-    .str { color: var(--string); }
-    .num { color: var(--number); }
-    .typ { color: var(--type); }
-    .enu { color: var(--enum); }
-    .cmt { color: var(--comment); font-style: italic; }
-    .op  { color: var(--operator); }
-    .prm { color: var(--param); }
-    .esc { color: var(--escape); }
-    .ent { color: var(--entity); }
-    .tag { color: var(--tag); }
-    .att { color: var(--attr); }
-    .ns  { color: var(--fg); }
-    .del { color: var(--keyword); font-style: italic; }
-    .ev  { color: var(--warm); font-weight: 600; }
-    .ext { color: var(--func); font-style: italic; }
-    .tp  { color: var(--type); font-style: italic; }
-    .mut { color: var(--local); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--fg-dim); }
-    .fst { color: var(--warm); }
-    .stc { color: var(--type); font-style: italic; }
-    .err { color: var(--error); text-decoration: wavy underline; text-decoration-color: var(--error); }
-  </style>
+.code-panels { flex: 1; overflow: hidden; position: relative; }
+.code-panel {
+  display: none;
+  height: 100%;
+  overflow-y: auto;
+  padding: 22px 28px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 14px;
+  line-height: 1.75;
+  scrollbar-width: thin;
+  scrollbar-color: #2a2e48 transparent;
+}
+.code-panel.active { display: block; }
+
+/* Clickable token spans */
+.t {
+  cursor: pointer;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+.t:hover { outline: 1px solid rgba(255,255,255,0.2); outline-offset: 1px; }
+.t.selected { outline: 2px solid var(--c-blue-bright); outline-offset: 1px; }
+</style>
 </head>
 <body>
 
-<h1>Nebula Haze</h1>
-<h2>Rider theme preview — open this file in a browser</h2>
+<div class="shell">
 
-<!-- ── IDE mock ──────────────────────────────────────────────── -->
-<div class="ide-mock">
-  <div class="ide-toolbar">
-    <div class="ide-toolbar-dot"></div>
-    <div class="ide-toolbar-dot"></div>
-    <div class="ide-toolbar-dot"></div>
-    <div class="ide-toolbar-title">Rider — MyProject</div>
-  </div>
-  <div class="ide-tab-bar">
-    <div class="ide-tab active">OrderService.cs</div>
-    <div class="ide-tab">appsettings.json</div>
-    <div class="ide-tab">_Layout.cshtml</div>
-  </div>
-  <div class="ide-body">
-    <div class="ide-sidebar">
-      <div class="ide-sidebar-item">📁 MyProject</div>
-      <div class="ide-sidebar-item active">  OrderService.cs</div>
-      <div class="ide-sidebar-item modified">  UserRepository.cs</div>
-      <div class="ide-sidebar-item new">  PaymentGateway.cs</div>
-      <div class="ide-sidebar-item deleted">  LegacyHelper.cs</div>
-      <div class="ide-sidebar-item">📁 Models</div>
-      <div class="ide-sidebar-item">  Order.cs</div>
+  <!-- ── SIDEBAR ───────────────────────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sb-header">
+      <div class="sb-header-name">Nebula Haze</div>
+      <div class="sb-header-sub">preview tool</div>
     </div>
-    <div class="ide-editor">
-      <div class="ide-code-line">
-        <span class="line-num">1</span>
-        <span><span class="kw">namespace</span> <span class="ns">MyProject.Services</span><span class="op">;</span></span>
+
+    <div class="sb-scroll">
+
+      <!-- PALETTE -->
+      <div>
+        <div class="sb-section-label">Palette</div>
+
+        <div class="family-row">
+          <div class="family-name">blue</div>
+          <div class="swatch-group">
+            <div class="swatch-col"><div class="swatch" data-slot="blue-dim"      style="background:#7494c8" onclick="selectSlot('blue-dim')"></div>      <div class="swatch-label">dim</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="blue-mid"      style="background:#8aabe6" onclick="selectSlot('blue-mid')"></div>      <div class="swatch-label">mid</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="blue-bright"   style="background:#a5bcf0" onclick="selectSlot('blue-bright')"></div>   <div class="swatch-label">brt</div></div>
+          </div>
+        </div>
+
+        <div class="family-row">
+          <div class="family-name">violet</div>
+          <div class="swatch-group">
+            <div class="swatch-col"><div class="swatch" data-slot="violet-dim"     style="background:#9480c8" onclick="selectSlot('violet-dim')"></div>     <div class="swatch-label">dim</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="violet-mid"     style="background:#c498ff" onclick="selectSlot('violet-mid')"></div>     <div class="swatch-label">mid</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="violet-bright"  style="background:#dbbeff" onclick="selectSlot('violet-bright')"></div>  <div class="swatch-label">brt</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="violet-whisper" style="background:#c2c0e8" onclick="selectSlot('violet-whisper')"></div> <div class="swatch-label">wsp</div></div>
+          </div>
+        </div>
+
+        <div class="family-row">
+          <div class="family-name">teal</div>
+          <div class="swatch-group">
+            <div class="swatch-col"><div class="swatch" data-slot="teal-dim"     style="background:#5a9e94" onclick="selectSlot('teal-dim')"></div>     <div class="swatch-label">dim</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="teal-mid"     style="background:#6ec4b6" onclick="selectSlot('teal-mid')"></div>     <div class="swatch-label">mid</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="teal-bright"  style="background:#8fd4c8" onclick="selectSlot('teal-bright')"></div>  <div class="swatch-label">brt</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="teal-whisper" style="background:#bdd8e8" onclick="selectSlot('teal-whisper')"></div> <div class="swatch-label">wsp</div></div>
+          </div>
+        </div>
+
+        <div class="family-row">
+          <div class="family-name">green</div>
+          <div class="swatch-group">
+            <div class="swatch-col"><div class="swatch" data-slot="green-dim"    style="background:#6a9e78" onclick="selectSlot('green-dim')"></div>    <div class="swatch-label">dim</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="green-mid"    style="background:#96cc9e" onclick="selectSlot('green-mid')"></div>    <div class="swatch-label">mid</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="green-bright" style="background:#88dda0" onclick="selectSlot('green-bright')"></div> <div class="swatch-label">brt</div></div>
+          </div>
+        </div>
+
+        <div class="family-row">
+          <div class="family-name">pink</div>
+          <div class="swatch-group">
+            <div class="swatch-col"><div class="swatch" data-slot="pink-dim"    style="background:#b07888" onclick="selectSlot('pink-dim')"></div>    <div class="swatch-label">dim</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="pink-mid"    style="background:#e888c0" onclick="selectSlot('pink-mid')"></div>    <div class="swatch-label">mid</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="pink-bright" style="background:#e0aabf" onclick="selectSlot('pink-bright')"></div> <div class="swatch-label">brt</div></div>
+          </div>
+        </div>
+
+        <div class="family-row">
+          <div class="family-name">sand</div>
+          <div class="swatch-group">
+            <div class="swatch-col"><div class="swatch" data-slot="sand-dim"    style="background:#a8a578" onclick="selectSlot('sand-dim')"></div>    <div class="swatch-label">dim</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="sand-mid"    style="background:#c5c28a" onclick="selectSlot('sand-mid')"></div>    <div class="swatch-label">mid</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="sand-bright" style="background:#d4d07a" onclick="selectSlot('sand-bright')"></div> <div class="swatch-label">brt</div></div>
+          </div>
+        </div>
+
+        <div class="family-row">
+          <div class="family-name">orange</div>
+          <div class="swatch-group">
+            <div class="swatch-col"><div class="swatch" data-slot="orange" style="background:#e09a68" onclick="selectSlot('orange')"></div> <div class="swatch-label">—</div></div>
+          </div>
+        </div>
       </div>
-      <div class="ide-code-line">
-        <span class="line-num">2</span>
-        <span></span>
+
+      <!-- INSPECTOR -->
+      <div>
+        <div class="sb-section-label">Inspector</div>
+        <div class="inspector" id="inspector">
+          <div class="inspector-empty">Click any token or swatch</div>
+        </div>
       </div>
-      <div class="ide-code-line caret">
-        <span class="line-num">3</span>
-        <span><span class="kw">public class</span> <span class="typ">OrderService</span></span>
+
+      <!-- CHANGES -->
+      <div class="changes-panel" id="changes-panel">
+        <div class="sb-section-label">Changes</div>
+        <div class="changes-header">
+          <div><span class="changes-dot"></span><span class="changes-count" id="changes-count">0 pending</span></div>
+          <div class="undo-redo">
+            <button class="icon-btn" id="btn-undo" onclick="doUndo()" title="Undo" disabled>↩</button>
+            <button class="icon-btn" id="btn-redo" onclick="doRedo()" title="Redo" disabled>↪</button>
+          </div>
+        </div>
+        <div class="change-list" id="change-list"></div>
+        <div class="changes-actions">
+          <button class="act-btn" onclick="doCopy()">Copy diff</button>
+          <button class="act-btn danger" onclick="doClear()">Clear all</button>
+        </div>
       </div>
-      <div class="ide-code-line">
-        <span class="line-num">4</span>
-        <span><span class="op">{</span></span>
-      </div>
-      <div class="ide-code-line">
-        <span class="line-num">5</span>
-        <span>    <span class="kw">private readonly</span> <span class="typ">ILogger</span><span class="op">&lt;</span><span class="typ">OrderService</span><span class="op">&gt;</span> <span class="fn">_logger</span><span class="op">;</span></span>
-      </div>
-      <div class="ide-code-line selected">
-        <span class="line-num">6</span>
-        <span>    <span class="cmt">// selection example</span></span>
-      </div>
+
     </div>
-  </div>
-  <div class="ide-status">
-    <span class="ide-status-accent">main</span>
-    <span>UTF-8</span>
-    <span>C#</span>
-    <span>Ln 3, Col 14</span>
-    <span style="margin-left:auto">Nebula Haze</span>
-  </div>
-</div>
+  </aside>
 
-<!-- ── Palette ───────────────────────────────────────────────── -->
-<h3>Palette</h3>
-<div class="swatches">
-  <div class="swatch"><div class="swatch-dot" style="background:#afa4e5"></div>keyword #afa4e5</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#85a7f5"></div>function #85a7f5</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#90d89f"></div>string #90d89f</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#d8c383"></div>number #d8c383</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#b1d0e6"></div>type #b1d0e6</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#73daca"></div>enum/struct #73daca</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#7ab8d8"></div>operator #7ab8d8</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#a0c5e9"></div>local #a0c5e9</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#c6afa9"></div>param #c6afa9</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#c9a55a"></div>event/format #c9a55a</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#5e6590"></div>comment #5e6590</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#c0caf5"></div>fg #c0caf5</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#e07891"></div>error #e07891</div>
-  <div class="swatch"><div class="swatch-dot" style="background:#7dcfff"></div>attr/link #7dcfff</div>
-</div>
+  <!-- ── MAIN ──────────────────────────────────────────────────────────────── -->
+  <main class="main">
+    <div class="lang-tabs" id="lang-tabs">
+      <div class="tab active" data-lang="cs">C#</div>
+      <div class="tab" data-lang="ts">TypeScript</div>
+      <div class="tab" data-lang="tsx">TSX</div>
+      <div class="tab" data-lang="vue">Vue</div>
+      <div class="tab" data-lang="html">HTML / CSS</div>
+      <div class="tab" data-lang="json">JSON</div>
+      <div class="tab" data-lang="sql">SQL</div>
+    </div>
 
-<!-- ── C# ────────────────────────────────────────────────────── -->
-<div class="card">
-  <div class="card-header"><span>C# — ReSharper semantic tokens</span><span>OrderService.cs</span></div>
-  <div class="card-body"><pre>
-<span class="kw">using</span> <span class="ns">System</span><span class="op">.</span><span class="ns">Collections</span><span class="op">.</span><span class="ns">Generic</span><span class="op">;</span>
+    <div class="code-panels">
 
-<span class="kw">namespace</span> <span class="ns">MyProject.Services</span><span class="op">;</span>
+      <!-- C# ─────────────────────────────────────────────────────────────── -->
+      <div class="code-panel active" id="panel-cs"><span class="t t-ann" data-tok="ann">[<span class="t t-ann" data-tok="ann">Route</span>(<span class="t t-str" data-tok="str">"api/users"</span>)]</span>
+<span class="t t-ann" data-tok="ann">[<span class="t t-ann" data-tok="ann">ApiController</span>]</span>
+<span class="t t-kw" data-tok="kw">public class</span> <span class="t t-cls" data-tok="cls">UserController</span> <span class="t t-op" data-tok="op">:</span> <span class="t t-cls" data-tok="cls">ControllerBase</span>
+<span class="t t-op" data-tok="op">{</span>
+    <span class="t t-kw" data-tok="kw">private readonly</span> <span class="t t-ifc" data-tok="ifc">IUserService</span> <span class="t t-pl" data-tok="pl">_service</span><span class="t t-op" data-tok="op">;</span>
+    <span class="t t-kw" data-tok="kw">private const int</span> <span class="t t-cst" data-tok="cst">MaxPageSize</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-num" data-tok="num">100</span><span class="t t-op" data-tok="op">;</span>
 
-<span class="cmt">/// &lt;summary&gt;Processes customer orders.&lt;/summary&gt;</span>
-<span class="op">[</span><span class="fn">Service</span><span class="op">]</span>
-<span class="kw">public class</span> <span class="typ">OrderService</span> <span class="op">:</span> <span class="typ">IOrderService</span>
-<span class="op">{</span>
-    <span class="cmt">// Delegate type</span>
-    <span class="kw">public delegate</span> <span class="del">void</span> <span class="enu">OrderHandler</span><span class="op">(</span><span class="typ">Order</span> <span class="prm">order</span><span class="op">);</span>
+    <span class="t t-kw" data-tok="kw">public</span> <span class="t t-fn" data-tok="fn">UserController</span><span class="t t-op" data-tok="op">(</span><span class="t t-ifc" data-tok="ifc">IUserService</span> <span class="t t-pm" data-tok="pm">service</span><span class="t t-op" data-tok="op">)</span>
+    <span class="t t-op" data-tok="op">{</span>
+        <span class="t t-pl" data-tok="pl">_service</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-pm" data-tok="pm">service</span><span class="t t-op" data-tok="op">;</span>
+    <span class="t t-op" data-tok="op">}</span>
 
-    <span class="cmt">// Event</span>
-    <span class="kw">public event</span> <span class="enu">OrderHandler</span> <span class="ev">OrderPlaced</span><span class="op">;</span>
+    <span class="t t-ann" data-tok="ann">[<span class="t t-ann" data-tok="ann">HttpGet</span>(<span class="t t-str" data-tok="str">"{id}"</span>)]</span>
+    <span class="t t-kw" data-tok="kw">public async</span> <span class="t t-cls" data-tok="cls">Task</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-cls" data-tok="cls">ActionResult</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-cls" data-tok="cls">UserDto</span><span class="t t-op" data-tok="op">&gt;&gt;</span> <span class="t t-fn" data-tok="fn">GetUser</span><span class="t t-op" data-tok="op">(</span><span class="t t-kw" data-tok="kw">int</span> <span class="t t-pm" data-tok="pm">id</span><span class="t t-op" data-tok="op">)</span>
+    <span class="t t-op" data-tok="op">{</span>
+        <span class="t t-kw" data-tok="kw">var</span> <span class="t t-pl" data-tok="pl">user</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-kw" data-tok="kw">await</span> <span class="t t-pl" data-tok="pl">_service</span><span class="t t-op" data-tok="op">.</span><span class="t t-fn" data-tok="fn">FindAsync</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">id</span><span class="t t-op" data-tok="op">);</span>
+        <span class="t t-kw" data-tok="kw">if</span> <span class="t t-op" data-tok="op">(</span><span class="t t-pl" data-tok="pl">user</span> <span class="t t-kw" data-tok="kw">is null</span><span class="t t-op" data-tok="op">)</span>
+            <span class="t t-kw" data-tok="kw">return</span> <span class="t t-fn" data-tok="fn">NotFound</span><span class="t t-op" data-tok="op">();</span>
+        <span class="t t-kw" data-tok="kw">return</span> <span class="t t-fn" data-tok="fn">Ok</span><span class="t t-op" data-tok="op">(</span><span class="t t-pl" data-tok="pl">user</span><span class="t t-op" data-tok="op">);</span>
+    <span class="t t-op" data-tok="op">}</span>
 
-    <span class="kw">private readonly</span> <span class="typ">ILogger</span><span class="op">&lt;</span><span class="typ">OrderService</span><span class="op">&gt;</span> _logger<span class="op">;</span>
+    <span class="t t-ann" data-tok="ann">[<span class="t t-ann" data-tok="ann">HttpPost</span>]</span>
+    <span class="t t-kw" data-tok="kw">public async</span> <span class="t t-cls" data-tok="cls">Task</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-cls" data-tok="cls">IActionResult</span><span class="t t-op" data-tok="op">&gt;</span> <span class="t t-fn" data-tok="fn">CreateUser</span><span class="t t-op" data-tok="op">(</span><span class="t t-cls" data-tok="cls">CreateUserDto</span> <span class="t t-pm" data-tok="pm">dto</span><span class="t t-op" data-tok="op">)</span>
+    <span class="t t-op" data-tok="op">{</span>
+        <span class="t t-kw" data-tok="kw">var</span> <span class="t t-pl" data-tok="pl">result</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-kw" data-tok="kw">await</span> <span class="t t-pl" data-tok="pl">_service</span><span class="t t-op" data-tok="op">.</span><span class="t t-fn" data-tok="fn">CreateAsync</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">dto</span><span class="t t-op" data-tok="op">);</span>
+        <span class="t t-kw" data-tok="kw">return</span> <span class="t t-fn" data-tok="fn">CreatedAtAction</span><span class="t t-op" data-tok="op">(</span><span class="t t-kw" data-tok="kw">nameof</span><span class="t t-op" data-tok="op">(</span><span class="t t-fn" data-tok="fn">GetUser</span><span class="t t-op" data-tok="op">),</span> <span class="t t-kw" data-tok="kw">new</span> <span class="t t-op" data-tok="op">{</span> <span class="t t-pl" data-tok="pl">id</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-pl" data-tok="pl">result</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">Id</span> <span class="t t-op" data-tok="op">},</span> <span class="t t-pl" data-tok="pl">result</span><span class="t t-op" data-tok="op">);</span>
+    <span class="t t-op" data-tok="op">}</span>
+<span class="t t-op" data-tok="op">}</span>
 
-    <span class="kw">public</span> <span class="fn">OrderService</span><span class="op">(</span><span class="typ">ILogger</span><span class="op">&lt;</span><span class="typ">OrderService</span><span class="op">&gt;</span> <span class="prm">logger</span><span class="op">)</span>
-    <span class="op">{</span>
-        _logger <span class="op">=</span> <span class="prm">logger</span><span class="op">;</span>
-    <span class="op">}</span>
+<span class="t t-cmt" data-tok="cmt">// Generic repository — exercises type params, interfaces, enums</span>
+<span class="t t-kw" data-tok="kw">public class</span> <span class="t t-cls" data-tok="cls">Repository</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-tp" data-tok="tp">T</span><span class="t t-op" data-tok="op">&gt;</span> <span class="t t-kw" data-tok="kw">where</span> <span class="t t-tp" data-tok="tp">T</span> <span class="t t-op" data-tok="op">:</span> <span class="t t-cls" data-tok="cls">Entity</span>
+<span class="t t-op" data-tok="op">{</span>
+    <span class="t t-kw" data-tok="kw">public</span> <span class="t t-cls" data-tok="cls">IEnumerable</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-tp" data-tok="tp">T</span><span class="t t-op" data-tok="op">&gt;</span> <span class="t t-fn" data-tok="fn">GetAll</span><span class="t t-op" data-tok="op">()</span> <span class="t t-op" data-tok="op">=&gt;</span> <span class="t t-pl" data-tok="pl">_db</span><span class="t t-op" data-tok="op">.</span><span class="t t-fn" data-tok="fn">Set</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-tp" data-tok="tp">T</span><span class="t t-op" data-tok="op">&gt;();</span>
 
-    <span class="cmt">// Generic method with type parameter</span>
-    <span class="kw">public</span> <span class="tp">T</span> <span class="fn">GetConfig</span><span class="op">&lt;</span><span class="tp">T</span><span class="op">&gt;(</span><span class="kw">string</span> <span class="prm">key</span><span class="op">)</span> <span class="op">=&gt;</span>
-        <span class="stc">ConfigReader</span><span class="op">.</span><span class="fn">Get</span><span class="op">&lt;</span><span class="tp">T</span><span class="op">&gt;(</span><span class="prm">key</span><span class="op">);</span>
+    <span class="t t-kw" data-tok="kw">public enum</span> <span class="t t-cls" data-tok="cls">SortOrder</span> <span class="t t-op" data-tok="op">{</span> <span class="t t-cst" data-tok="cst">Ascending</span><span class="t t-op" data-tok="op">,</span> <span class="t t-cst" data-tok="cst">Descending</span> <span class="t t-op" data-tok="op">}</span>
 
-    <span class="cmt">// Async method — format string, mutable local, null-coalescing</span>
-    <span class="kw">public async</span> <span class="typ">Task</span><span class="op">&lt;</span><span class="typ">OrderResult</span><span class="op">&gt;</span> <span class="fn">PlaceOrderAsync</span><span class="op">(</span><span class="typ">Order</span> <span class="prm">order</span><span class="op">)</span>
-    <span class="op">{</span>
-        <span class="mut">var</span> id <span class="op">=</span> <span class="prm">order</span><span class="op">.</span>Id <span class="op">??</span> <span class="typ">Guid</span><span class="op">.</span><span class="fn">NewGuid</span><span class="op">();</span>
-        _logger<span class="op">.</span><span class="fn">LogInformation</span><span class="op">(</span><span class="str">"Placing order {</span><span class="fst">0</span><span class="str">} for {</span><span class="fst">1</span><span class="str">}"</span><span class="op">,</span> id<span class="op">,</span> <span class="prm">order</span><span class="op">.</span>Customer<span class="op">);</span>
+    <span class="t t-kw" data-tok="kw">public interface</span> <span class="t t-ifc" data-tok="ifc">ISpecification</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-tp" data-tok="tp">T</span><span class="t t-op" data-tok="op">&gt;</span>
+    <span class="t t-op" data-tok="op">{</span>
+        <span class="t t-cls" data-tok="cls">Expression</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-cls" data-tok="cls">Func</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-tp" data-tok="tp">T</span><span class="t t-op" data-tok="op">,</span> <span class="t t-kw" data-tok="kw">bool</span><span class="t t-op" data-tok="op">&gt;&gt;</span> <span class="t t-pl" data-tok="pl">Criteria</span> <span class="t t-op" data-tok="op">{</span> <span class="t t-kw" data-tok="kw">get</span><span class="t t-op" data-tok="op">;</span> <span class="t t-op" data-tok="op">}</span>
+    <span class="t t-op" data-tok="op">}</span>
+<span class="t t-op" data-tok="op">}</span></div>
 
-        <span class="cmt">// Inlay hints (LINQ chain) — dimmed so they don't fight the code</span>
-        <span class="kw">var</span> results <span class="op">=</span> <span class="prm">order</span><span class="op">.</span>Items
-            <span class="op">.</span><span class="ext">Where</span><span class="op">(</span><span class="inlay">item:</span> x <span class="op">=&gt;</span> x<span class="op">.</span>Stock <span class="op">&gt;</span> <span class="num">0</span><span class="op">)</span>
-            <span class="op">.</span><span class="ext">Select</span><span class="op">(</span><span class="inlay">selector:</span> x <span class="op">=&gt;</span> x<span class="op">.</span>Price <span class="op">*</span> x<span class="op">.</span>Qty<span class="op">)</span>
-            <span class="op">.</span><span class="ext">ToList</span><span class="op">();</span>
+      <!-- TypeScript ──────────────────────────────────────────────────────── -->
+      <div class="code-panel" id="panel-ts"><span class="t t-kw" data-tok="kw">interface</span> <span class="t t-ifc" data-tok="ifc">UserRepository</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-wtp" data-tok="wtp">T</span> <span class="t t-kw" data-tok="kw">extends</span> <span class="t t-cls" data-tok="cls">Entity</span><span class="t t-op" data-tok="op">&gt;</span> <span class="t t-op" data-tok="op">{</span>
+  <span class="t t-fn" data-tok="fn">findById</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">id</span><span class="t t-op" data-tok="op">:</span> <span class="t t-kw" data-tok="kw">number</span><span class="t t-op" data-tok="op">):</span> <span class="t t-cls" data-tok="cls">Promise</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-wtp" data-tok="wtp">T</span> <span class="t t-op" data-tok="op">|</span> <span class="t t-kw" data-tok="kw">null</span><span class="t t-op" data-tok="op">&gt;;</span>
+  <span class="t t-fn" data-tok="fn">save</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">entity</span><span class="t t-op" data-tok="op">:</span> <span class="t t-wtp" data-tok="wtp">T</span><span class="t t-op" data-tok="op">):</span> <span class="t t-cls" data-tok="cls">Promise</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-kw" data-tok="kw">void</span><span class="t t-op" data-tok="op">&gt;;</span>
+  <span class="t t-fn" data-tok="fn">delete</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">id</span><span class="t t-op" data-tok="op">:</span> <span class="t t-kw" data-tok="kw">number</span><span class="t t-op" data-tok="op">):</span> <span class="t t-cls" data-tok="cls">Promise</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-kw" data-tok="kw">boolean</span><span class="t t-op" data-tok="op">&gt;;</span>
+<span class="t t-op" data-tok="op">}</span>
 
-        <span class="kw">await</span> <span class="fn">SaveAsync</span><span class="op">(</span><span class="prm">order</span><span class="op">);</span>
-        <span class="ev">OrderPlaced</span><span class="op">?.</span><span class="fn">Invoke</span><span class="op">(</span><span class="prm">order</span><span class="op">);</span>
-        <span class="kw">return new</span> <span class="typ">OrderResult</span> <span class="op">{</span> Id <span class="op">=</span> id <span class="op">};</span>
-    <span class="op">}</span>
-<span class="op">}</span>
+<span class="t t-kw" data-tok="kw">class</span> <span class="t t-cls" data-tok="cls">UserService</span> <span class="t t-kw" data-tok="kw">implements</span> <span class="t t-ifc" data-tok="ifc">UserRepository</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-cls" data-tok="cls">User</span><span class="t t-op" data-tok="op">&gt;</span> <span class="t t-op" data-tok="op">{</span>
+  <span class="t t-kw" data-tok="kw">private readonly</span> <span class="t t-pl" data-tok="pl">cache</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-kw" data-tok="kw">new</span> <span class="t t-cls" data-tok="cls">Map</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-kw" data-tok="kw">number</span><span class="t t-op" data-tok="op">,</span> <span class="t t-cls" data-tok="cls">User</span><span class="t t-op" data-tok="op">&gt;();</span>
 
-<span class="cmt">// Struct (value type)</span>
-<span class="kw">public readonly struct</span> <span class="enu">Money</span><span class="op">(</span><span class="kw">decimal</span> <span class="prm">amount</span><span class="op">,</span> <span class="kw">string</span> <span class="prm">currency</span><span class="op">)</span>
-<span class="op">{</span>
-    <span class="kw">public</span> <span class="kw">decimal</span> Amount <span class="op">{</span> <span class="kw">get</span><span class="op">;</span> <span class="op">}</span> <span class="op">=</span> <span class="prm">amount</span><span class="op">;</span>
-    <span class="kw">public</span> <span class="kw">string</span> Currency <span class="op">{</span> <span class="kw">get</span><span class="op">;</span> <span class="op">}</span> <span class="op">=</span> <span class="prm">currency</span><span class="op">;</span>
-<span class="op">}</span>
+  <span class="t t-kw" data-tok="kw">async</span> <span class="t t-fn" data-tok="fn">findById</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">id</span><span class="t t-op" data-tok="op">:</span> <span class="t t-kw" data-tok="kw">number</span><span class="t t-op" data-tok="op">):</span> <span class="t t-cls" data-tok="cls">Promise</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-cls" data-tok="cls">User</span> <span class="t t-op" data-tok="op">|</span> <span class="t t-kw" data-tok="kw">null</span><span class="t t-op" data-tok="op">&gt;</span> <span class="t t-op" data-tok="op">{</span>
+    <span class="t t-kw" data-tok="kw">if</span> <span class="t t-op" data-tok="op">(</span><span class="t t-kw" data-tok="kw">this</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">cache</span><span class="t t-op" data-tok="op">.</span><span class="t t-fn" data-tok="fn">has</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">id</span><span class="t t-op" data-tok="op">))</span>
+      <span class="t t-kw" data-tok="kw">return</span> <span class="t t-kw" data-tok="kw">this</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">cache</span><span class="t t-op" data-tok="op">.</span><span class="t t-fn" data-tok="fn">get</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">id</span><span class="t t-op" data-tok="op">)!;</span>
+    <span class="t t-kw" data-tok="kw">const</span> <span class="t t-pl" data-tok="pl">user</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-kw" data-tok="kw">await</span> <span class="t t-fn" data-tok="fn">fetchUser</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">id</span><span class="t t-op" data-tok="op">);</span>
+    <span class="t t-kw" data-tok="kw">this</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">cache</span><span class="t t-op" data-tok="op">.</span><span class="t t-fn" data-tok="fn">set</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">id</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pl" data-tok="pl">user</span><span class="t t-op" data-tok="op">);</span>
+    <span class="t t-kw" data-tok="kw">return</span> <span class="t t-pl" data-tok="pl">user</span><span class="t t-op" data-tok="op">;</span>
+  <span class="t t-op" data-tok="op">}</span>
 
-<span class="cmt">// Enum</span>
-<span class="kw">public enum</span> <span class="enu">OrderStatus</span>
-<span class="op">{</span>
-    <span class="enu">Pending</span> <span class="op">=</span> <span class="num">0</span><span class="op">,</span>
-    <span class="enu">Processing</span> <span class="op">=</span> <span class="num">1</span><span class="op">,</span>
-    <span class="enu">Completed</span> <span class="op">=</span> <span class="num">2</span><span class="op">,</span>
-    <span class="enu">Cancelled</span> <span class="op">=</span> <span class="num">3</span>
-<span class="op">}</span>
+  <span class="t t-kw" data-tok="kw">async</span> <span class="t t-fn" data-tok="fn">save</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">entity</span><span class="t t-op" data-tok="op">:</span> <span class="t t-cls" data-tok="cls">User</span><span class="t t-op" data-tok="op">):</span> <span class="t t-cls" data-tok="cls">Promise</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-kw" data-tok="kw">void</span><span class="t t-op" data-tok="op">&gt;</span> <span class="t t-op" data-tok="op">{</span>
+    <span class="t t-kw" data-tok="kw">await</span> <span class="t t-fn" data-tok="fn">db</span><span class="t t-op" data-tok="op">.</span><span class="t t-fn" data-tok="fn">put</span><span class="t t-op" data-tok="op">(</span><span class="t t-str" data-tok="str">'users'</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pm" data-tok="pm">entity</span><span class="t t-op" data-tok="op">);</span>
+    <span class="t t-kw" data-tok="kw">this</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">cache</span><span class="t t-op" data-tok="op">.</span><span class="t t-fn" data-tok="fn">set</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">entity</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">id</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pm" data-tok="pm">entity</span><span class="t t-op" data-tok="op">);</span>
+  <span class="t t-op" data-tok="op">}</span>
+<span class="t t-op" data-tok="op">}</span>
 
-<span class="cmt">// Extension method</span>
-<span class="kw">public static class</span> <span class="stc">OrderExtensions</span>
-<span class="op">{</span>
-    <span class="kw">public static bool</span> <span class="ext">IsComplete</span><span class="op">(</span><span class="kw">this</span> <span class="typ">Order</span> <span class="prm">order</span><span class="op">)</span> <span class="op">=&gt;</span>
-        <span class="prm">order</span><span class="op">.</span>Status <span class="op">==</span> <span class="enu">OrderStatus</span><span class="op">.</span><span class="enu">Completed</span><span class="op">;</span>
-<span class="op">}</span></pre>
-  </div>
-</div>
+<span class="t t-cmt" data-tok="cmt">// Utility type + const assertion</span>
+<span class="t t-kw" data-tok="kw">type</span> <span class="t t-cls" data-tok="cls">DeepReadonly</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-wtp" data-tok="wtp">T</span><span class="t t-op" data-tok="op">&gt;</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-op" data-tok="op">{</span>
+  <span class="t t-kw" data-tok="kw">readonly</span> <span class="t t-op" data-tok="op">[</span><span class="t t-cls" data-tok="cls">K</span> <span class="t t-kw" data-tok="kw">in keyof</span> <span class="t t-wtp" data-tok="wtp">T</span><span class="t t-op" data-tok="op">]:</span> <span class="t t-wtp" data-tok="wtp">T</span><span class="t t-op" data-tok="op">[</span><span class="t t-cls" data-tok="cls">K</span><span class="t t-op" data-tok="op">]</span> <span class="t t-kw" data-tok="kw">extends</span> <span class="t t-kw" data-tok="kw">object</span> <span class="t t-op" data-tok="op">?</span> <span class="t t-cls" data-tok="cls">DeepReadonly</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-wtp" data-tok="wtp">T</span><span class="t t-op" data-tok="op">[</span><span class="t t-cls" data-tok="cls">K</span><span class="t t-op" data-tok="op">]&gt;</span> <span class="t t-op" data-tok="op">:</span> <span class="t t-wtp" data-tok="wtp">T</span><span class="t t-op" data-tok="op">[</span><span class="t t-cls" data-tok="cls">K</span><span class="t t-op" data-tok="op">];</span>
+<span class="t t-op" data-tok="op">};</span>
 
-<!-- ── HTML ──────────────────────────────────────────────────── -->
-<div class="card">
-  <div class="card-header"><span>HTML</span><span>index.html</span></div>
-  <div class="card-body"><pre>
-<span class="op">&lt;!</span><span class="tag">DOCTYPE</span> <span class="att">html</span><span class="op">&gt;</span>
-<span class="op">&lt;</span><span class="tag">html</span> <span class="att">lang</span><span class="op">="</span><span class="str">en</span><span class="op">"&gt;</span>
-  <span class="op">&lt;</span><span class="tag">head</span><span class="op">&gt;</span>
-    <span class="op">&lt;</span><span class="tag">meta</span> <span class="att">charset</span><span class="op">="</span><span class="str">UTF-8</span><span class="op">" /&gt;</span>
-    <span class="op">&lt;</span><span class="tag">title</span><span class="op">&gt;</span>My App<span class="op">&lt;/</span><span class="tag">title</span><span class="op">&gt;</span>
-  <span class="op">&lt;/</span><span class="tag">head</span><span class="op">&gt;</span>
-  <span class="op">&lt;</span><span class="tag">body</span><span class="op">&gt;</span>
-    <span class="cmt">&lt;!-- main content --&gt;</span>
-    <span class="op">&lt;</span><span class="tag">h1</span> <span class="att">id</span><span class="op">="</span><span class="str">heading</span><span class="op">" </span><span class="att">class</span><span class="op">="</span><span class="str">title</span><span class="op">"&gt;</span>Hello <span class="ent">&amp;amp;</span> welcome<span class="op">&lt;/</span><span class="tag">h1</span><span class="op">&gt;</span>
-    <span class="op">&lt;</span><span class="tag">p</span> <span class="att">data-count</span><span class="op">="</span><span class="num">42</span><span class="op">"&gt;</span>Paragraph<span class="op">&lt;/</span><span class="tag">p</span><span class="op">&gt;</span>
-  <span class="op">&lt;/</span><span class="tag">body</span><span class="op">&gt;</span>
-<span class="op">&lt;/</span><span class="tag">html</span><span class="op">&gt;</span></pre>
-  </div>
-</div>
+<span class="t t-kw" data-tok="kw">const</span> <span class="t t-cst" data-tok="cst">ROLES</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-op" data-tok="op">[</span><span class="t t-str" data-tok="str">'admin'</span><span class="t t-op" data-tok="op">,</span> <span class="t t-str" data-tok="str">'editor'</span><span class="t t-op" data-tok="op">,</span> <span class="t t-str" data-tok="str">'viewer'</span><span class="t t-op" data-tok="op">]</span> <span class="t t-kw" data-tok="kw">as const</span><span class="t t-op" data-tok="op">;</span>
+<span class="t t-kw" data-tok="kw">type</span> <span class="t t-cls" data-tok="cls">Role</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-kw" data-tok="kw">typeof</span> <span class="t t-cst" data-tok="cst">ROLES</span><span class="t t-op" data-tok="op">[</span><span class="t t-kw" data-tok="kw">number</span><span class="t t-op" data-tok="op">];</span></div>
 
-<!-- ── Razor ─────────────────────────────────────────────────── -->
-<div class="card">
-  <div class="card-header"><span>Razor (.cshtml)</span><span>_Layout.cshtml</span></div>
-  <div class="card-body"><pre>
-<span class="op">@</span><span class="kw">model</span> <span class="typ">OrderViewModel</span>
+      <!-- TSX ─────────────────────────────────────────────────────────────── -->
+      <div class="code-panel" id="panel-tsx"><span class="t t-kw" data-tok="kw">interface</span> <span class="t t-cls" data-tok="cls">Props</span> <span class="t t-op" data-tok="op">{</span>
+  <span class="t t-pl" data-tok="pl">userId</span><span class="t t-op" data-tok="op">:</span> <span class="t t-kw" data-tok="kw">number</span><span class="t t-op" data-tok="op">;</span>
+  <span class="t t-fn" data-tok="fn">onSelect</span><span class="t t-op" data-tok="op">:</span> <span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">user</span><span class="t t-op" data-tok="op">:</span> <span class="t t-cls" data-tok="cls">User</span><span class="t t-op" data-tok="op">)</span> <span class="t t-op" data-tok="op">=&gt;</span> <span class="t t-kw" data-tok="kw">void</span><span class="t t-op" data-tok="op">;</span>
+<span class="t t-op" data-tok="op">}</span>
 
-<span class="op">&lt;</span><span class="tag">div</span> <span class="att">class</span><span class="op">="</span><span class="str">order-card</span><span class="op">"&gt;</span>
-    <span class="op">&lt;</span><span class="tag">h2</span><span class="op">&gt;</span>Order <span style="background:var(--bg-razor)"><span class="op">@</span><span class="typ">Model</span><span class="op">.</span>Id</span><span class="op">&lt;/</span><span class="tag">h2</span><span class="op">&gt;</span>
-    <span style="background:var(--bg-razor)"><span class="op">@if</span> <span class="op">(</span><span class="typ">Model</span><span class="op">.</span><span class="fn">IsComplete</span><span class="op">())</span>
-    <span class="op">{</span>
-        <span class="op">&lt;</span><span class="tag">span</span> <span class="att">class</span><span class="op">="</span><span class="str">badge</span><span class="op">"&gt;</span>Done<span class="op">&lt;/</span><span class="tag">span</span><span class="op">&gt;</span>
-    <span class="op">}</span></span>
-    <span class="op">&lt;</span><span class="tag">p</span><span class="op">&gt;</span>Total: <span style="background:var(--bg-razor)"><span class="op">@</span><span class="typ">Model</span><span class="op">.</span>Total<span class="op">.</span><span class="fn">ToString</span><span class="op">(</span><span class="str">"C"</span><span class="op">)</span></span><span class="op">&lt;/</span><span class="tag">p</span><span class="op">&gt;</span>
-<span class="op">&lt;/</span><span class="tag">div</span><span class="op">&gt;</span></pre>
-  </div>
-</div>
+<span class="t t-kw" data-tok="kw">const</span> <span class="t t-cls" data-tok="cls">UserCard</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-op" data-tok="op">({</span> <span class="t t-pm" data-tok="pm">userId</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pm" data-tok="pm">onSelect</span> <span class="t t-op" data-tok="op">}:</span> <span class="t t-cls" data-tok="cls">Props</span><span class="t t-op" data-tok="op">)</span> <span class="t t-op" data-tok="op">=&gt;</span> <span class="t t-op" data-tok="op">{</span>
+  <span class="t t-kw" data-tok="kw">const</span> <span class="t t-op" data-tok="op">[</span><span class="t t-pl" data-tok="pl">user</span><span class="t t-op" data-tok="op">,</span> <span class="t t-fn" data-tok="fn">setUser</span><span class="t t-op" data-tok="op">]</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-fn" data-tok="fn">useState</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-cls" data-tok="cls">User</span> <span class="t t-op" data-tok="op">|</span> <span class="t t-kw" data-tok="kw">null</span><span class="t t-op" data-tok="op">&gt;(</span><span class="t t-kw" data-tok="kw">null</span><span class="t t-op" data-tok="op">);</span>
+  <span class="t t-kw" data-tok="kw">const</span> <span class="t t-op" data-tok="op">[</span><span class="t t-pl" data-tok="pl">loading</span><span class="t t-op" data-tok="op">,</span> <span class="t t-fn" data-tok="fn">setLoading</span><span class="t t-op" data-tok="op">]</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-fn" data-tok="fn">useState</span><span class="t t-op" data-tok="op">(</span><span class="t t-kw" data-tok="kw">false</span><span class="t t-op" data-tok="op">);</span>
 
-<!-- ── JSON ──────────────────────────────────────────────────── -->
-<div class="card">
-  <div class="card-header"><span>JSON</span><span>appsettings.json</span></div>
-  <div class="card-body"><pre>
-<span class="op">{</span>
-  <span class="json-key">"ConnectionStrings"</span><span class="op">:</span> <span class="op">{</span>
-    <span class="json-key">"Default"</span><span class="op">:</span> <span class="str">"Server=localhost;Database=shop"</span>
-  <span class="op">},</span>
-  <span class="json-key">"FeatureFlags"</span><span class="op">:</span> <span class="op">{</span>
-    <span class="json-key">"NewCheckout"</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span>
-    <span class="json-key">"LegacyApi"</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span>
-    <span class="json-key">"MaxRetries"</span><span class="op">:</span> <span class="num">3</span><span class="op">,</span>
-    <span class="json-key">"Timeout"</span><span class="op">:</span> <span class="kw">null</span>
-  <span class="op">}</span>
-<span class="op">}</span></pre>
-  </div>
-</div>
+  <span class="t t-fn" data-tok="fn">useEffect</span><span class="t t-op" data-tok="op">(()</span> <span class="t t-op" data-tok="op">=&gt;</span> <span class="t t-op" data-tok="op">{</span>
+    <span class="t t-fn" data-tok="fn">setLoading</span><span class="t t-op" data-tok="op">(</span><span class="t t-kw" data-tok="kw">true</span><span class="t t-op" data-tok="op">);</span>
+    <span class="t t-fn" data-tok="fn">fetchUser</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">userId</span><span class="t t-op" data-tok="op">).</span><span class="t t-fn" data-tok="fn">then</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">u</span> <span class="t t-op" data-tok="op">=&gt;</span> <span class="t t-op" data-tok="op">{</span> <span class="t t-fn" data-tok="fn">setUser</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">u</span><span class="t t-op" data-tok="op">);</span> <span class="t t-fn" data-tok="fn">setLoading</span><span class="t t-op" data-tok="op">(</span><span class="t t-kw" data-tok="kw">false</span><span class="t t-op" data-tok="op">);</span> <span class="t t-op" data-tok="op">});</span>
+  <span class="t t-op" data-tok="op">},</span> <span class="t t-op" data-tok="op">[</span><span class="t t-pm" data-tok="pm">userId</span><span class="t t-op" data-tok="op">]);</span>
 
-<!-- ── XML ───────────────────────────────────────────────────── -->
-<div class="card">
-  <div class="card-header"><span>XML</span><span>config.xml</span></div>
-  <div class="card-body"><pre>
-<span class="op">&lt;?</span><span class="tag">xml</span> <span class="att">version</span><span class="op">="</span><span class="str">1.0</span><span class="op">"</span> <span class="att">encoding</span><span class="op">="</span><span class="str">utf-8</span><span class="op">"?&gt;</span>
-<span class="op">&lt;</span><span class="tag">configuration</span><span class="op">&gt;</span>
-  <span class="cmt">&lt;!-- database settings --&gt;</span>
-  <span class="op">&lt;</span><span class="tag">database</span> <span class="att">provider</span><span class="op">="</span><span class="str">postgres</span><span class="op">" </span><span class="att">port</span><span class="op">="</span><span class="num">5432</span><span class="op">"&gt;</span>
-    <span class="op">&lt;</span><span class="tag">host</span><span class="op">&gt;</span>localhost<span class="op">&lt;/</span><span class="tag">host</span><span class="op">&gt;</span>
-    <span class="op">&lt;</span><span class="tag">name</span><span class="op">&gt;</span>shopdb <span class="ent">&amp;amp;</span> audit<span class="op">&lt;/</span><span class="tag">name</span><span class="op">&gt;</span>
-  <span class="op">&lt;/</span><span class="tag">database</span><span class="op">&gt;</span>
-<span class="op">&lt;/</span><span class="tag">configuration</span><span class="op">&gt;</span></pre>
-  </div>
-</div>
+  <span class="t t-kw" data-tok="kw">if</span> <span class="t t-op" data-tok="op">(</span><span class="t t-pl" data-tok="pl">loading</span><span class="t t-op" data-tok="op">)</span> <span class="t t-kw" data-tok="kw">return</span> <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">Spinner</span> <span class="t t-attr" data-tok="attr">size</span><span class="t t-op" data-tok="op">={</span><span class="t t-num" data-tok="num">24</span><span class="t t-op" data-tok="op">} /&gt;;</span>
 
-<!-- ── YAML ──────────────────────────────────────────────────── -->
-<div class="card">
-  <div class="card-header"><span>YAML</span><span>docker-compose.yml</span></div>
-  <div class="card-body"><pre>
-<span class="yaml-key">version</span><span class="op">:</span> <span class="str">"3.9"</span>
-<span class="yaml-key">services</span><span class="op">:</span>
-  <span class="yaml-key">api</span><span class="op">:</span>
-    <span class="yaml-key">image</span><span class="op">:</span> <span class="str">myapp:latest</span>
-    <span class="yaml-key">ports</span><span class="op">:</span>
-      <span class="op">-</span> <span class="str">"8080:80"</span>
-    <span class="yaml-key">environment</span><span class="op">:</span>
-      <span class="yaml-key">ASPNETCORE_ENVIRONMENT</span><span class="op">:</span> <span class="str">Production</span>
-      <span class="yaml-key">MAX_WORKERS</span><span class="op">:</span> <span class="num">4</span>
-    <span class="yaml-key">depends_on</span><span class="op">:</span>
-      <span class="op">-</span> <span class="str">postgres</span>
-      <span class="op">-</span> <span class="str">redis</span></pre>
-  </div>
-</div>
+  <span class="t t-kw" data-tok="kw">return</span> <span class="t t-op" data-tok="op">(</span>
+    <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">div</span> <span class="t t-attr" data-tok="attr">className</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"user-card"</span><span class="t t-op" data-tok="op">&gt;</span>
+      <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">Avatar</span> <span class="t t-attr" data-tok="attr">userId</span><span class="t t-op" data-tok="op">={</span><span class="t t-pm" data-tok="pm">userId</span><span class="t t-op" data-tok="op">}</span> <span class="t t-attr" data-tok="attr">size</span><span class="t t-op" data-tok="op">={</span><span class="t t-num" data-tok="num">48</span><span class="t t-op" data-tok="op">}</span> <span class="t t-attr" data-tok="attr">alt</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"avatar"</span> <span class="t t-op" data-tok="op">/&gt;</span>
+      <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">h2</span> <span class="t t-attr" data-tok="attr">className</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"user-name"</span><span class="t t-op" data-tok="op">&gt;{</span><span class="t t-pl" data-tok="pl">user</span><span class="t t-op" data-tok="op">?.</span><span class="t t-pl" data-tok="pl">name</span><span class="t t-op" data-tok="op">}&lt;/</span><span class="t t-tag" data-tok="tag">h2</span><span class="t t-op" data-tok="op">&gt;</span>
+      <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">button</span>
+        <span class="t t-attr" data-tok="attr">onClick</span><span class="t t-op" data-tok="op">={() =&gt;</span> <span class="t t-pl" data-tok="pl">user</span> <span class="t t-op" data-tok="op">&amp;&amp;</span> <span class="t t-fn" data-tok="fn">onSelect</span><span class="t t-op" data-tok="op">(</span><span class="t t-pl" data-tok="pl">user</span><span class="t t-op" data-tok="op">)}</span>
+        <span class="t t-attr" data-tok="attr">disabled</span><span class="t t-op" data-tok="op">={!</span><span class="t t-pl" data-tok="pl">user</span><span class="t t-op" data-tok="op">}</span>
+      <span class="t t-op" data-tok="op">&gt;</span>
+        Select
+      <span class="t t-op" data-tok="op">&lt;/</span><span class="t t-tag" data-tok="tag">button</span><span class="t t-op" data-tok="op">&gt;</span>
+    <span class="t t-op" data-tok="op">&lt;/</span><span class="t t-tag" data-tok="tag">div</span><span class="t t-op" data-tok="op">&gt;</span>
+  <span class="t t-op" data-tok="op">);</span>
+<span class="t t-op" data-tok="op">};</span>
 
+<span class="t t-kw" data-tok="kw">export default</span> <span class="t t-cls" data-tok="cls">UserCard</span><span class="t t-op" data-tok="op">;</span></div>
+
+      <!-- Vue ─────────────────────────────────────────────────────────────── -->
+      <div class="code-panel" id="panel-vue"><span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">template</span><span class="t t-op" data-tok="op">&gt;</span>
+  <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">div</span> <span class="t t-attr" data-tok="attr">class</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"user-list"</span><span class="t t-op" data-tok="op">&gt;</span>
+    <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">UserCard</span>
+      <span class="t t-attr" data-tok="attr">v-for</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"user in users"</span>
+      <span class="t t-attr" data-tok="attr">:key</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"user.id"</span>
+      <span class="t t-attr" data-tok="attr">:user</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"user"</span>
+      <span class="t t-attr" data-tok="attr">@select</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"handleSelect"</span>
+    <span class="t t-op" data-tok="op">/&gt;</span>
+    <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">p</span> <span class="t t-attr" data-tok="attr">v-if</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"!users.length"</span> <span class="t t-attr" data-tok="attr">class</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"empty"</span><span class="t t-op" data-tok="op">&gt;</span>No users<span class="t t-op" data-tok="op">&lt;/</span><span class="t t-tag" data-tok="tag">p</span><span class="t t-op" data-tok="op">&gt;</span>
+  <span class="t t-op" data-tok="op">&lt;/</span><span class="t t-tag" data-tok="tag">div</span><span class="t t-op" data-tok="op">&gt;</span>
+<span class="t t-op" data-tok="op">&lt;/</span><span class="t t-tag" data-tok="tag">template</span><span class="t t-op" data-tok="op">&gt;</span>
+
+<span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">script</span> <span class="t t-attr" data-tok="attr">setup</span> <span class="t t-attr" data-tok="attr">lang</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"ts"</span><span class="t t-op" data-tok="op">&gt;</span>
+<span class="t t-kw" data-tok="kw">import</span> <span class="t t-op" data-tok="op">{</span> <span class="t t-pl" data-tok="pl">ref</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pl" data-tok="pl">computed</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pl" data-tok="pl">onMounted</span> <span class="t t-op" data-tok="op">}</span> <span class="t t-kw" data-tok="kw">from</span> <span class="t t-str" data-tok="str">'vue'</span>
+<span class="t t-kw" data-tok="kw">import</span> <span class="t t-cls" data-tok="cls">UserCard</span> <span class="t t-kw" data-tok="kw">from</span> <span class="t t-str" data-tok="str">'./UserCard.vue'</span>
+
+<span class="t t-kw" data-tok="kw">const</span> <span class="t t-pl" data-tok="pl">emit</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-fn" data-tok="fn">defineEmits</span><span class="t t-op" data-tok="op">&lt;{</span>
+  <span class="t t-op" data-tok="op">(</span><span class="t t-pl" data-tok="pl">e</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">'selected'</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pm" data-tok="pm">user</span><span class="t t-op" data-tok="op">:</span> <span class="t t-cls" data-tok="cls">User</span><span class="t t-op" data-tok="op">):</span> <span class="t t-kw" data-tok="kw">void</span>
+<span class="t t-op" data-tok="op">}&gt;()</span>
+
+<span class="t t-kw" data-tok="kw">const</span> <span class="t t-pl" data-tok="pl">users</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-fn" data-tok="fn">ref</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-cls" data-tok="cls">User</span><span class="t t-op" data-tok="op">[]&gt;([])</span>
+<span class="t t-kw" data-tok="kw">const</span> <span class="t t-pl" data-tok="pl">total</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-fn" data-tok="fn">computed</span><span class="t t-op" data-tok="op">(()</span> <span class="t t-op" data-tok="op">=&gt;</span> <span class="t t-pl" data-tok="pl">users</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">value</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">length</span><span class="t t-op" data-tok="op">)</span>
+
+<span class="t t-fn" data-tok="fn">onMounted</span><span class="t t-op" data-tok="op">(async () =&gt; {</span>
+  <span class="t t-pl" data-tok="pl">users</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">value</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-kw" data-tok="kw">await</span> <span class="t t-fn" data-tok="fn">fetchUsers</span><span class="t t-op" data-tok="op">()</span>
+<span class="t t-op" data-tok="op">})</span>
+
+<span class="t t-kw" data-tok="kw">const</span> <span class="t t-fn" data-tok="fn">handleSelect</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">user</span><span class="t t-op" data-tok="op">:</span> <span class="t t-cls" data-tok="cls">User</span><span class="t t-op" data-tok="op">)</span> <span class="t t-op" data-tok="op">=&gt;</span> <span class="t t-fn" data-tok="fn">emit</span><span class="t t-op" data-tok="op">(</span><span class="t t-str" data-tok="str">'selected'</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pm" data-tok="pm">user</span><span class="t t-op" data-tok="op">)</span>
+<span class="t t-op" data-tok="op">&lt;/</span><span class="t t-tag" data-tok="tag">script</span><span class="t t-op" data-tok="op">&gt;</span>
+
+<span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">style</span> <span class="t t-attr" data-tok="attr">scoped</span><span class="t t-op" data-tok="op">&gt;</span>
+<span class="t t-op" data-tok="op">.</span><span class="t t-cls" data-tok="cls">user-list</span> <span class="t t-op" data-tok="op">{</span>
+  <span class="t t-fn" data-tok="fn">display</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">grid</span><span class="t t-op" data-tok="op">;</span>
+  <span class="t t-fn" data-tok="fn">gap</span><span class="t t-op" data-tok="op">:</span> <span class="t t-num" data-tok="num">1</span><span class="t t-str" data-tok="str">rem</span><span class="t t-op" data-tok="op">;</span>
+<span class="t t-op" data-tok="op">}</span>
+<span class="t t-op" data-tok="op">&lt;/</span><span class="t t-tag" data-tok="tag">style</span><span class="t t-op" data-tok="op">&gt;</span></div>
+
+      <!-- HTML / CSS ──────────────────────────────────────────────────────── -->
+      <div class="code-panel" id="panel-html"><span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">nav</span> <span class="t t-attr" data-tok="attr">class</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"main-nav"</span> <span class="t t-attr" data-tok="attr">aria-label</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"primary"</span><span class="t t-op" data-tok="op">&gt;</span>
+  <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">a</span> <span class="t t-attr" data-tok="attr">href</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"/"</span> <span class="t t-attr" data-tok="attr">class</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"nav-link"</span><span class="t t-op" data-tok="op">&gt;</span>Home<span class="t t-op" data-tok="op">&lt;/</span><span class="t t-tag" data-tok="tag">a</span><span class="t t-op" data-tok="op">&gt;</span>
+  <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">a</span> <span class="t t-attr" data-tok="attr">href</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"/about"</span> <span class="t t-attr" data-tok="attr">class</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"nav-link active"</span><span class="t t-op" data-tok="op">&gt;</span>About<span class="t t-op" data-tok="op">&lt;/</span><span class="t t-tag" data-tok="tag">a</span><span class="t t-op" data-tok="op">&gt;</span>
+<span class="t t-op" data-tok="op">&lt;/</span><span class="t t-tag" data-tok="tag">nav</span><span class="t t-op" data-tok="op">&gt;</span>
+
+<span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">section</span> <span class="t t-attr" data-tok="attr">id</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"hero"</span> <span class="t t-attr" data-tok="attr">class</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"hero-banner"</span> <span class="t t-attr" data-tok="attr">data-theme</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"dark"</span><span class="t t-op" data-tok="op">&gt;</span>
+  <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">h1</span><span class="t t-op" data-tok="op">&gt;</span>Hello World<span class="t t-op" data-tok="op">&lt;/</span><span class="t t-tag" data-tok="tag">h1</span><span class="t t-op" data-tok="op">&gt;</span>
+  <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">p</span><span class="t t-op" data-tok="op">&gt;</span>Entity: <span class="t t-esc" data-tok="esc">&amp;amp;</span> <span class="t t-esc" data-tok="esc">&amp;copy;</span> <span class="t t-esc" data-tok="esc">&amp;#x1F600;</span><span class="t t-op" data-tok="op">&lt;/</span><span class="t t-tag" data-tok="tag">p</span><span class="t t-op" data-tok="op">&gt;</span>
+<span class="t t-op" data-tok="op">&lt;/</span><span class="t t-tag" data-tok="tag">section</span><span class="t t-op" data-tok="op">&gt;</span>
+
+<span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">style</span><span class="t t-op" data-tok="op">&gt;</span>
+  <span class="t t-op" data-tok="op">.</span><span class="t t-cls" data-tok="cls">main-nav</span> <span class="t t-op" data-tok="op">{</span>
+    <span class="t t-fn" data-tok="fn">display</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">flex</span><span class="t t-op" data-tok="op">;</span>
+    <span class="t t-fn" data-tok="fn">gap</span><span class="t t-op" data-tok="op">:</span> <span class="t t-num" data-tok="num">1</span><span class="t t-str" data-tok="str">rem</span><span class="t t-op" data-tok="op">;</span>
+    <span class="t t-fn" data-tok="fn">padding</span><span class="t t-op" data-tok="op">:</span> <span class="t t-num" data-tok="num">0.75</span><span class="t t-str" data-tok="str">rem</span> <span class="t t-num" data-tok="num">1.5</span><span class="t t-str" data-tok="str">rem</span><span class="t t-op" data-tok="op">;</span>
+    <span class="t t-fn" data-tok="fn">background</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">#1a1d2e</span><span class="t t-op" data-tok="op">;</span>
+  <span class="t t-op" data-tok="op">}</span>
+  <span class="t t-op" data-tok="op">.</span><span class="t t-cls" data-tok="cls">nav-link</span> <span class="t t-op" data-tok="op">{</span>
+    <span class="t t-fn" data-tok="fn">color</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">#c0caf5</span><span class="t t-op" data-tok="op">;</span>
+    <span class="t t-fn" data-tok="fn">text-decoration</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">none</span><span class="t t-op" data-tok="op">;</span>
+    <span class="t t-fn" data-tok="fn">padding</span><span class="t t-op" data-tok="op">:</span> <span class="t t-num" data-tok="num">0.5</span><span class="t t-str" data-tok="str">rem</span> <span class="t t-num" data-tok="num">1</span><span class="t t-str" data-tok="str">rem</span><span class="t t-op" data-tok="op">;</span>
+    <span class="t t-fn" data-tok="fn">border-radius</span><span class="t t-op" data-tok="op">:</span> <span class="t t-num" data-tok="num">4</span><span class="t t-str" data-tok="str">px</span><span class="t t-op" data-tok="op">;</span>
+  <span class="t t-op" data-tok="op">}</span>
+  <span class="t t-op" data-tok="op">.</span><span class="t t-cls" data-tok="cls">nav-link</span><span class="t t-op" data-tok="op">.</span><span class="t t-cls" data-tok="cls">active</span> <span class="t t-op" data-tok="op">{</span>
+    <span class="t t-fn" data-tok="fn">color</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">#a5bcf0</span><span class="t t-op" data-tok="op">;</span>
+    <span class="t t-fn" data-tok="fn">background</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">rgba(165, 188, 240, 0.1)</span><span class="t t-op" data-tok="op">;</span>
+  <span class="t t-op" data-tok="op">}</span>
+<span class="t t-op" data-tok="op">&lt;/</span><span class="t t-tag" data-tok="tag">style</span><span class="t t-op" data-tok="op">&gt;</span></div>
+
+      <!-- JSON ────────────────────────────────────────────────────────────── -->
+      <div class="code-panel" id="panel-json"><span class="t t-op" data-tok="op">{</span>
+  <span class="t t-fn" data-tok="fn">"name"</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">"nebula-haze"</span><span class="t t-op" data-tok="op">,</span>
+  <span class="t t-fn" data-tok="fn">"version"</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">"1.0.0"</span><span class="t t-op" data-tok="op">,</span>
+  <span class="t t-fn" data-tok="fn">"active"</span><span class="t t-op" data-tok="op">:</span> <span class="t t-kw" data-tok="kw">true</span><span class="t t-op" data-tok="op">,</span>
+  <span class="t t-fn" data-tok="fn">"count"</span><span class="t t-op" data-tok="op">:</span> <span class="t t-num" data-tok="num">42</span><span class="t t-op" data-tok="op">,</span>
+  <span class="t t-fn" data-tok="fn">"ratio"</span><span class="t t-op" data-tok="op">:</span> <span class="t t-num" data-tok="num">3.14</span><span class="t t-op" data-tok="op">,</span>
+  <span class="t t-fn" data-tok="fn">"nullable"</span><span class="t t-op" data-tok="op">:</span> <span class="t t-kw" data-tok="kw">null</span><span class="t t-op" data-tok="op">,</span>
+  <span class="t t-fn" data-tok="fn">"palette"</span><span class="t t-op" data-tok="op">: {</span>
+    <span class="t t-fn" data-tok="fn">"violet-mid"</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">"#c498ff"</span><span class="t t-op" data-tok="op">,</span>
+    <span class="t t-fn" data-tok="fn">"blue-mid"</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">"#8aabe6"</span><span class="t t-op" data-tok="op">,</span>
+    <span class="t t-fn" data-tok="fn">"green-bright"</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">"#88dda0"</span>
+  <span class="t t-op" data-tok="op">},</span>
+  <span class="t t-fn" data-tok="fn">"tags"</span><span class="t t-op" data-tok="op">: [</span><span class="t t-str" data-tok="str">"dark"</span><span class="t t-op" data-tok="op">,</span> <span class="t t-str" data-tok="str">"nebula"</span><span class="t t-op" data-tok="op">,</span> <span class="t t-str" data-tok="str">"jetbrains"</span><span class="t t-op" data-tok="op">]</span>
+<span class="t t-op" data-tok="op">}</span></div>
+
+      <!-- SQL ─────────────────────────────────────────────────────────────── -->
+      <div class="code-panel" id="panel-sql"><span class="t t-kw" data-tok="kw">SELECT</span>
+    <span class="t t-pl" data-tok="pl">u</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">id</span><span class="t t-op" data-tok="op">,</span>
+    <span class="t t-pl" data-tok="pl">u</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">name</span><span class="t t-op" data-tok="op">,</span>
+    <span class="t t-pl" data-tok="pl">u</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">email</span><span class="t t-op" data-tok="op">,</span>
+    <span class="t t-fn" data-tok="fn">COUNT</span><span class="t t-op" data-tok="op">(</span><span class="t t-pl" data-tok="pl">o</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">id</span><span class="t t-op" data-tok="op">)</span> <span class="t t-kw" data-tok="kw">AS</span> <span class="t t-pl" data-tok="pl">order_count</span><span class="t t-op" data-tok="op">,</span>
+    <span class="t t-fn" data-tok="fn">MAX</span><span class="t t-op" data-tok="op">(</span><span class="t t-pl" data-tok="pl">o</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">total</span><span class="t t-op" data-tok="op">)</span> <span class="t t-kw" data-tok="kw">AS</span> <span class="t t-pl" data-tok="pl">max_order</span>
+<span class="t t-kw" data-tok="kw">FROM</span> <span class="t t-pl" data-tok="pl">users</span> <span class="t t-pl" data-tok="pl">u</span>
+<span class="t t-kw" data-tok="kw">LEFT JOIN</span> <span class="t t-pl" data-tok="pl">orders</span> <span class="t t-pl" data-tok="pl">o</span> <span class="t t-kw" data-tok="kw">ON</span> <span class="t t-pl" data-tok="pl">o</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">user_id</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-pl" data-tok="pl">u</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">id</span>
+<span class="t t-kw" data-tok="kw">WHERE</span> <span class="t t-pl" data-tok="pl">u</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">created_at</span> <span class="t t-op" data-tok="op">&gt;</span> <span class="t t-str" data-tok="str">'2024-01-01'</span>
+  <span class="t t-kw" data-tok="kw">AND</span> <span class="t t-pl" data-tok="pl">u</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">status</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-str" data-tok="str">'active'</span>
+<span class="t t-kw" data-tok="kw">GROUP BY</span> <span class="t t-pl" data-tok="pl">u</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">id</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pl" data-tok="pl">u</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">name</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pl" data-tok="pl">u</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">email</span>
+<span class="t t-kw" data-tok="kw">HAVING</span> <span class="t t-fn" data-tok="fn">COUNT</span><span class="t t-op" data-tok="op">(</span><span class="t t-pl" data-tok="pl">o</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">id</span><span class="t t-op" data-tok="op">)</span> <span class="t t-op" data-tok="op">&gt;</span> <span class="t t-num" data-tok="num">5</span>
+<span class="t t-kw" data-tok="kw">ORDER BY</span> <span class="t t-pl" data-tok="pl">order_count</span> <span class="t t-kw" data-tok="kw">DESC</span>
+<span class="t t-kw" data-tok="kw">LIMIT</span> <span class="t t-num" data-tok="num">20</span><span class="t t-op" data-tok="op">;</span>
+
+<span class="t t-cmt" data-tok="cmt">-- Insert with returning clause</span>
+<span class="t t-kw" data-tok="kw">INSERT INTO</span> <span class="t t-pl" data-tok="pl">audit_log</span> <span class="t t-op" data-tok="op">(</span><span class="t t-pl" data-tok="pl">user_id</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pl" data-tok="pl">action</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pl" data-tok="pl">created_at</span><span class="t t-op" data-tok="op">)</span>
+<span class="t t-kw" data-tok="kw">VALUES</span> <span class="t t-op" data-tok="op">(</span><span class="t t-num" data-tok="num">42</span><span class="t t-op" data-tok="op">,</span> <span class="t t-str" data-tok="str">'login'</span><span class="t t-op" data-tok="op">,</span> <span class="t t-fn" data-tok="fn">NOW</span><span class="t t-op" data-tok="op">())</span>
+<span class="t t-kw" data-tok="kw">RETURNING</span> <span class="t t-pl" data-tok="pl">id</span><span class="t t-op" data-tok="op">;</span></div>
+
+    </div><!-- /code-panels -->
+  </main>
+
+</div><!-- /shell -->
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+let changes    = [];   // { slot, oldHex, newHex }[]
+let cursor     = 0;    // applied = changes[0..cursor-1]
+let curSlot    = null; // slot currently shown in inspector
+let curTokKey  = null; // token key that triggered the inspector (may be null for swatch clicks)
+let curPalette = Object.assign({}, PALETTE);
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+applyPalette(curPalette);
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function hexOf(slot) { return curPalette[slot] || PALETTE[slot] || '#000000'; }
+function isValidHex(v) { return /^#[0-9a-fA-F]{6}$/.test(v); }
+
+// ── Inspector ─────────────────────────────────────────────────────────────────
+function selectSlot(slot, tokKey) {
+  curSlot   = slot;
+  curTokKey = tokKey || null;
+
+  document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+  const sw = document.querySelector(`.swatch[data-slot="${slot}"]`);
+  if (sw) sw.classList.add('active');
+
+  renderInspector();
+}
+
+function renderInspector() {
+  if (!curSlot) return;
+  const slot   = curSlot;
+  const hex    = hexOf(slot);
+  const tokens = SLOT_TOKENS[slot] || [];
+
+  const tokenLine = curTokKey
+    ? `<div class="inspector-token-label">${TOKEN_LABELS[curTokKey] || curTokKey}</div>`
+    : '';
+
+  const otherLabels = tokens
+    .filter(k => k !== curTokKey)
+    .map(k => TOKEN_LABELS[k])
+    .filter(Boolean);
+  const alsoLine = otherLabels.length
+    ? `<div class="also-used"><b>Also:</b> ${otherLabels.join(', ')}</div>`
+    : '';
+
+  document.getElementById('inspector').innerHTML = `
+    ${tokenLine}
+    <div class="inspector-slot">${slot}</div>
+    <div class="color-row">
+      <input type="color" class="color-picker" id="icp" value="${hex}">
+      <input type="text"  class="hex-input"    id="ihx" value="${hex}" maxlength="7" spellcheck="false">
+    </div>
+    ${alsoLine}
+  `;
+
+  document.getElementById('icp').addEventListener('input', e => {
+    document.getElementById('ihx').value = e.target.value;
+    applyEdit(slot, e.target.value);
+  });
+
+  document.getElementById('ihx').addEventListener('keydown', e => {
+    if (e.key === 'Enter') e.target.blur();
+  });
+  document.getElementById('ihx').addEventListener('blur', e => {
+    let v = e.target.value.trim();
+    if (!v.startsWith('#')) v = '#' + v;
+    if (isValidHex(v)) {
+      document.getElementById('icp').value = v;
+      applyEdit(slot, v);
+    } else {
+      e.target.value = hexOf(slot);
+    }
+  });
+}
+
+function refreshInspectorColor() {
+  const icp = document.getElementById('icp');
+  const ihx = document.getElementById('ihx');
+  if (icp && ihx && curSlot) {
+    const h = hexOf(curSlot);
+    icp.value = h;
+    ihx.value = h;
+  }
+}
+
+function selectToken(span) {
+  document.querySelectorAll('.t.selected').forEach(s => s.classList.remove('selected'));
+  span.classList.add('selected');
+  const tok  = span.dataset.tok;
+  const slot = TOKEN_SLOTS[tok];
+  if (slot) selectSlot(slot, tok);
+}
+
+// ── Edit / Undo / Redo ────────────────────────────────────────────────────────
+function applyEdit(slot, newHex) {
+  if (newHex === hexOf(slot)) return;
+  const oldHex = hexOf(slot);
+  changes = changes.slice(0, cursor);
+  changes.push({ slot, oldHex, newHex });
+  cursor++;
+  curPalette[slot] = newHex;
+  applyPalette(curPalette);
+  updateSwatchColor(slot);
+  renderChanges();
+}
+
+function doUndo() {
+  if (cursor === 0) return;
+  cursor--;
+  const ch = changes[cursor];
+  curPalette[ch.slot] = ch.oldHex;
+  applyPalette(curPalette);
+  updateSwatchColor(ch.slot);
+  refreshInspectorColor();
+  renderChanges();
+}
+
+function doRedo() {
+  if (cursor >= changes.length) return;
+  const ch = changes[cursor];
+  curPalette[ch.slot] = ch.newHex;
+  cursor++;
+  applyPalette(curPalette);
+  updateSwatchColor(ch.slot);
+  refreshInspectorColor();
+  renderChanges();
+}
+
+function revertChange(idx) {
+  changes.splice(idx, 1);
+  if (cursor > idx) cursor--;
+  curPalette = Object.assign({}, PALETTE);
+  for (let i = 0; i < cursor; i++) curPalette[changes[i].slot] = changes[i].newHex;
+  applyPalette(curPalette);
+  document.querySelectorAll('.swatch[data-slot]').forEach(s =>
+    s.style.background = hexOf(s.dataset.slot)
+  );
+  refreshInspectorColor();
+  renderChanges();
+}
+
+function updateSwatchColor(slot) {
+  const sw = document.querySelector(`.swatch[data-slot="${slot}"]`);
+  if (sw) sw.style.background = hexOf(slot);
+}
+
+function doCopy() {
+  const applied = changes.slice(0, cursor);
+  if (!applied.length) return;
+  const maxLen = Math.max(...applied.map(c => c.slot.length));
+  const text = applied.map(c =>
+    `${c.slot.padEnd(maxLen)}  ${c.oldHex} → ${c.newHex}`
+  ).join('\n');
+  navigator.clipboard.writeText(text).catch(() => {});
+}
+
+function doClear() {
+  changes = [];
+  cursor  = 0;
+  curPalette = Object.assign({}, PALETTE);
+  applyPalette(curPalette);
+  document.querySelectorAll('.swatch[data-slot]').forEach(s =>
+    s.style.background = PALETTE[s.dataset.slot] || s.style.background
+  );
+  refreshInspectorColor();
+  renderChanges();
+}
+
+// ── Render changes panel ──────────────────────────────────────────────────────
+function renderChanges() {
+  const panel   = document.getElementById('changes-panel');
+  const applied = changes.slice(0, cursor);
+  const undone  = changes.slice(cursor);
+
+  if (!applied.length && !undone.length) {
+    panel.classList.remove('visible');
+    return;
+  }
+  panel.classList.add('visible');
+
+  document.getElementById('changes-count').textContent = `${applied.length} pending`;
+  document.getElementById('btn-undo').disabled = cursor === 0;
+  document.getElementById('btn-redo').disabled = cursor >= changes.length;
+
+  const list = document.getElementById('change-list');
+  list.innerHTML =
+    applied.map((ch, i) => `
+      <div class="change-row">
+        <div class="change-slot">${ch.slot}</div>
+        <div class="ch-swatch" style="background:${ch.oldHex}"></div>
+        <div class="ch-arrow">→</div>
+        <div class="ch-swatch" style="background:${ch.newHex}"></div>
+        <div class="ch-hex" style="color:${ch.newHex}">${ch.newHex}</div>
+        <div class="ch-revert" onclick="revertChange(${i})" title="Revert">✕</div>
+      </div>
+    `).join('') +
+    undone.map(ch => `
+      <div class="change-row" style="opacity:0.35">
+        <div class="change-slot">${ch.slot}</div>
+        <div class="ch-swatch" style="background:${ch.oldHex}"></div>
+        <div class="ch-arrow">→</div>
+        <div class="ch-swatch" style="background:${ch.newHex}"></div>
+        <div class="ch-hex" style="color:${ch.newHex}">${ch.newHex}</div>
+      </div>
+    `).join('');
+}
+
+// ── Token click delegation ────────────────────────────────────────────────────
+document.querySelector('.code-panels').addEventListener('click', e => {
+  const span = e.target.closest('.t[data-tok]');
+  if (span) selectToken(span);
+});
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+document.getElementById('lang-tabs').addEventListener('click', e => {
+  const tab = e.target.closest('.tab[data-lang]');
+  if (!tab) return;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.code-panel').forEach(p => p.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById('panel-' + tab.dataset.lang).classList.add('active');
+});
+</script>
 </body>
 </html>
