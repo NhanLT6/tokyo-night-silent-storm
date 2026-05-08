@@ -62,12 +62,14 @@ const TOKEN_SLOTS = {
   esc:  'blue-dim',
   pl:   'plain',
   tmpl: 'violet-dim',
-  ih:   'inlay',
-  err:  'error',
-  warn: 'warning',
-  gadd: 'green-bright',
-  gmod: 'sand-bright',
-  gdel: 'pink-bright',
+  ih:     'inlay',
+  err:    'error',
+  warn:   'warning',
+  gadd:   'green-bright',
+  gmod:   'sand-bright',
+  gdel:   'pink-bright',
+  todo:   'orange-mid',
+  csscls: 'teal-bright',
 };
 
 // ── TOKEN_LABELS: css-class suffix → human label ─────────────────────────────
@@ -93,9 +95,11 @@ const TOKEN_LABELS = {
   ih:   'Inlay hint',
   err:  'Error diagnostic',
   warn: 'Warning diagnostic',
-  gadd: 'Git added',
-  gmod: 'Git modified',
-  gdel: 'Git deleted',
+  gadd:   'Git added',
+  gmod:   'Git modified',
+  gdel:   'Git deleted',
+  todo:   'TODO highlight',
+  csscls: 'CSS class selector',
 };
 
 // ── SLOT_TOKENS: slot → list of token keys that use it ───────────────────────
@@ -139,9 +143,11 @@ function applyPalette(pal) {
 .t-ih   { color: var(--c-inlay); font-style: italic; }
 .t-err  { color: var(--c-error); }
 .t-warn { color: var(--c-warning); }
-.t-gadd { background: var(--c-green-bright); display: inline-block; width: 3px; height: 18px; border-radius: 1px; vertical-align: middle; padding: 0; }
-.t-gmod { background: var(--c-sand-bright);  display: inline-block; width: 3px; height: 18px; border-radius: 1px; vertical-align: middle; padding: 0; }
-.t-gdel { background: var(--c-pink-bright);  display: inline-block; width: 3px; height: 18px; border-radius: 1px; vertical-align: middle; padding: 0; }
+.t-gadd   { background: var(--c-green-bright); display: inline-block; width: 3px; height: 18px; border-radius: 1px; vertical-align: middle; padding: 0; }
+.t-gmod   { background: var(--c-sand-bright);  display: inline-block; width: 3px; height: 18px; border-radius: 1px; vertical-align: middle; padding: 0; }
+.t-gdel   { background: var(--c-pink-bright);  display: inline-block; width: 3px; height: 18px; border-radius: 1px; vertical-align: middle; padding: 0; }
+.t-todo   { color: var(--c-orange-mid); font-weight: bold; }
+.t-csscls { color: var(--c-teal-bright); }
 
 /* ── IDE Features panel ──────────────────────────────────────────── */
 #panel-ide { white-space: normal; }
@@ -515,6 +521,7 @@ body {
     <div class="lang-tabs" id="lang-tabs">
       <div class="tab active" data-lang="cs">C#</div>
       <div class="tab" data-lang="ts">TypeScript</div>
+      <div class="tab" data-lang="js">JavaScript</div>
       <div class="tab" data-lang="tsx">TSX</div>
       <div class="tab" data-lang="vue">Vue</div>
       <div class="tab" data-lang="html">HTML / CSS</div>
@@ -554,6 +561,7 @@ body {
     <span class="t t-ann" data-tok="ann">[<span class="t t-ann" data-tok="ann">HttpPost</span>]</span>
     <span class="t t-kw" data-tok="kw">public async</span> <span class="t t-cls" data-tok="cls">Task</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-cls" data-tok="cls">IActionResult</span><span class="t t-op" data-tok="op">&gt;</span> <span class="t t-fn" data-tok="fn">CreateUser</span><span class="t t-op" data-tok="op">(</span><span class="t t-cls" data-tok="cls">CreateUserDto</span> <span class="t t-pm" data-tok="pm">dto</span><span class="t t-op" data-tok="op">)</span>
     <span class="t t-op" data-tok="op">{</span>
+        <span class="t t-todo" data-tok="todo">// TODO: add rate limiting</span>
         <span class="t t-kw" data-tok="kw">var</span> <span class="t t-pl" data-tok="pl">result</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-kw" data-tok="kw">await</span> <span class="t t-pl" data-tok="pl">_service</span><span class="t t-op" data-tok="op">.</span><span class="t t-fn" data-tok="fn">CreateAsync</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">dto</span><span class="t t-op" data-tok="op">);</span>
         <span class="t t-kw" data-tok="kw">return</span> <span class="t t-fn" data-tok="fn">CreatedAtAction</span><span class="t t-op" data-tok="op">(</span><span class="t t-kw" data-tok="kw">nameof</span><span class="t t-op" data-tok="op">(</span><span class="t t-fn" data-tok="fn">GetUser</span><span class="t t-op" data-tok="op">),</span> <span class="t t-kw" data-tok="kw">new</span> <span class="t t-op" data-tok="op">{</span> <span class="t t-pl" data-tok="pl">id</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-pl" data-tok="pl">result</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">Id</span> <span class="t t-op" data-tok="op">},</span> <span class="t t-pl" data-tok="pl">result</span><span class="t t-op" data-tok="op">);</span>
     <span class="t t-op" data-tok="op">}</span>
@@ -603,6 +611,44 @@ body {
 
 <span class="t t-kw" data-tok="kw">const</span> <span class="t t-cst" data-tok="cst">ROLES</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-op" data-tok="op">[</span><span class="t t-str" data-tok="str">'admin'</span><span class="t t-op" data-tok="op">,</span> <span class="t t-str" data-tok="str">'editor'</span><span class="t t-op" data-tok="op">,</span> <span class="t t-str" data-tok="str">'viewer'</span><span class="t t-op" data-tok="op">]</span> <span class="t t-kw" data-tok="kw">as const</span><span class="t t-op" data-tok="op">;</span>
 <span class="t t-kw" data-tok="kw">type</span> <span class="t t-cls" data-tok="cls">Role</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-kw" data-tok="kw">typeof</span> <span class="t t-cst" data-tok="cst">ROLES</span><span class="t t-op" data-tok="op">[</span><span class="t t-kw" data-tok="kw">number</span><span class="t t-op" data-tok="op">];</span></div>
+
+      <!-- JavaScript ─────────────────────────────────────────────────────── -->
+      <div class="code-panel" id="panel-js"><span class="t t-todo" data-tok="todo">// TODO: add retry back-off strategy</span>
+<span class="t t-kw" data-tok="kw">import</span> <span class="t t-op" data-tok="op">{</span> <span class="t t-cls" data-tok="cls">EventEmitter</span> <span class="t t-op" data-tok="op">}</span> <span class="t t-kw" data-tok="kw">from</span> <span class="t t-str" data-tok="str">'events'</span><span class="t t-op" data-tok="op">;</span>
+
+<span class="t t-kw" data-tok="kw">const</span> <span class="t t-cst" data-tok="cst">MAX_RETRIES</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-num" data-tok="num">3</span><span class="t t-op" data-tok="op">;</span>
+<span class="t t-kw" data-tok="kw">const</span> <span class="t t-cst" data-tok="cst">BASE_DELAY</span>  <span class="t t-op" data-tok="op">=</span> <span class="t t-num" data-tok="num">300</span><span class="t t-op" data-tok="op">;</span>
+
+<span class="t t-kw" data-tok="kw">class</span> <span class="t t-cls" data-tok="cls">ApiClient</span> <span class="t t-kw" data-tok="kw">extends</span> <span class="t t-cls" data-tok="cls">EventEmitter</span> <span class="t t-op" data-tok="op">{</span>
+  <span class="t t-pl" data-tok="pl">#baseUrl</span><span class="t t-op" data-tok="op">;</span>
+  <span class="t t-pl" data-tok="pl">#retries</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-num" data-tok="num">0</span><span class="t t-op" data-tok="op">;</span>
+
+  <span class="t t-fn" data-tok="fn">constructor</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">baseUrl</span><span class="t t-op" data-tok="op">)</span> <span class="t t-op" data-tok="op">{</span>
+    <span class="t t-kw" data-tok="kw">super</span><span class="t t-op" data-tok="op">();</span>
+    <span class="t t-kw" data-tok="kw">this</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">#baseUrl</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-pm" data-tok="pm">baseUrl</span><span class="t t-op" data-tok="op">;</span>
+  <span class="t t-op" data-tok="op">}</span>
+
+  <span class="t t-kw" data-tok="kw">async</span> <span class="t t-fn" data-tok="fn">request</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">endpoint</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pm" data-tok="pm">opts</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-op" data-tok="op">{})</span> <span class="t t-op" data-tok="op">{</span>
+    <span class="t t-kw" data-tok="kw">const</span> <span class="t t-pl" data-tok="pl">url</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-str" data-tok="str">`${this.#baseUrl}${endpoint}`</span><span class="t t-op" data-tok="op">;</span>
+    <span class="t t-kw" data-tok="kw">try</span> <span class="t t-op" data-tok="op">{</span>
+      <span class="t t-kw" data-tok="kw">const</span> <span class="t t-pl" data-tok="pl">res</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-kw" data-tok="kw">await</span> <span class="t t-fn" data-tok="fn">fetch</span><span class="t t-op" data-tok="op">(</span><span class="t t-pl" data-tok="pl">url</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pm" data-tok="pm">opts</span><span class="t t-op" data-tok="op">);</span>
+      <span class="t t-kw" data-tok="kw">if</span> <span class="t t-op" data-tok="op">(!</span><span class="t t-pl" data-tok="pl">res</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">ok</span><span class="t t-op" data-tok="op">)</span> <span class="t t-kw" data-tok="kw">throw new</span> <span class="t t-cls" data-tok="cls">Error</span><span class="t t-op" data-tok="op">(</span><span class="t t-str" data-tok="str">`HTTP ${res.status}`</span><span class="t t-op" data-tok="op">);</span>
+      <span class="t t-kw" data-tok="kw">return await</span> <span class="t t-pl" data-tok="pl">res</span><span class="t t-op" data-tok="op">.</span><span class="t t-fn" data-tok="fn">json</span><span class="t t-op" data-tok="op">();</span>
+    <span class="t t-op" data-tok="op">}</span> <span class="t t-kw" data-tok="kw">catch</span> <span class="t t-op" data-tok="op">(</span><span class="t t-pl" data-tok="pl">err</span><span class="t t-op" data-tok="op">)</span> <span class="t t-op" data-tok="op">{</span>
+      <span class="t t-kw" data-tok="kw">if</span> <span class="t t-op" data-tok="op">(</span><span class="t t-kw" data-tok="kw">this</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">#retries</span> <span class="t t-op" data-tok="op">&lt;</span> <span class="t t-cst" data-tok="cst">MAX_RETRIES</span><span class="t t-op" data-tok="op">)</span> <span class="t t-op" data-tok="op">{</span>
+        <span class="t t-kw" data-tok="kw">this</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">#retries</span><span class="t t-op" data-tok="op">++;</span>
+        <span class="t t-kw" data-tok="kw">return this</span><span class="t t-op" data-tok="op">.</span><span class="t t-fn" data-tok="fn">request</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">endpoint</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pm" data-tok="pm">opts</span><span class="t t-op" data-tok="op">);</span>
+      <span class="t t-op" data-tok="op">}</span>
+      <span class="t t-kw" data-tok="kw">this</span><span class="t t-op" data-tok="op">.</span><span class="t t-fn" data-tok="fn">emit</span><span class="t t-op" data-tok="op">(</span><span class="t t-str" data-tok="str">'error'</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pl" data-tok="pl">err</span><span class="t t-op" data-tok="op">);</span>
+      <span class="t t-kw" data-tok="kw">throw</span> <span class="t t-pl" data-tok="pl">err</span><span class="t t-op" data-tok="op">;</span>
+    <span class="t t-op" data-tok="op">}</span>
+  <span class="t t-op" data-tok="op">}</span>
+<span class="t t-op" data-tok="op">}</span>
+
+<span class="t t-cmt" data-tok="cmt">// factory shorthand</span>
+<span class="t t-kw" data-tok="kw">const</span> <span class="t t-fn" data-tok="fn">createClient</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">baseUrl</span><span class="t t-op" data-tok="op">)</span> <span class="t t-op" data-tok="op">=&gt;</span> <span class="t t-kw" data-tok="kw">new</span> <span class="t t-cls" data-tok="cls">ApiClient</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">baseUrl</span><span class="t t-op" data-tok="op">);</span>
+
+<span class="t t-kw" data-tok="kw">export</span> <span class="t t-op" data-tok="op">{</span> <span class="t t-cls" data-tok="cls">ApiClient</span><span class="t t-op" data-tok="op">,</span> <span class="t t-fn" data-tok="fn">createClient</span> <span class="t t-op" data-tok="op">};</span></div>
 
       <!-- TSX ─────────────────────────────────────────────────────────────── -->
       <div class="code-panel" id="panel-tsx"><span class="t t-kw" data-tok="kw">interface</span> <span class="t t-cls" data-tok="cls">Props</span> <span class="t t-op" data-tok="op">{</span>
@@ -669,7 +715,7 @@ body {
 <span class="t t-op" data-tok="op">&lt;/</span><span class="t t-tag" data-tok="tag">script</span><span class="t t-op" data-tok="op">&gt;</span>
 
 <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">style</span> <span class="t t-attr" data-tok="attr">scoped</span><span class="t t-op" data-tok="op">&gt;</span>
-<span class="t t-op" data-tok="op">.</span><span class="t t-cls" data-tok="cls">user-list</span> <span class="t t-op" data-tok="op">{</span>
+<span class="t t-op" data-tok="op">.</span><span class="t t-csscls" data-tok="csscls">user-list</span> <span class="t t-op" data-tok="op">{</span>
   <span class="t t-fn" data-tok="fn">display</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">grid</span><span class="t t-op" data-tok="op">;</span>
   <span class="t t-fn" data-tok="fn">gap</span><span class="t t-op" data-tok="op">:</span> <span class="t t-num" data-tok="num">1</span><span class="t t-str" data-tok="str">rem</span><span class="t t-op" data-tok="op">;</span>
 <span class="t t-op" data-tok="op">}</span>
@@ -687,19 +733,19 @@ body {
 <span class="t t-op" data-tok="op">&lt;/</span><span class="t t-tag" data-tok="tag">section</span><span class="t t-op" data-tok="op">&gt;</span>
 
 <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">style</span><span class="t t-op" data-tok="op">&gt;</span>
-  <span class="t t-op" data-tok="op">.</span><span class="t t-cls" data-tok="cls">main-nav</span> <span class="t t-op" data-tok="op">{</span>
+  <span class="t t-op" data-tok="op">.</span><span class="t t-csscls" data-tok="csscls">main-nav</span> <span class="t t-op" data-tok="op">{</span>
     <span class="t t-fn" data-tok="fn">display</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">flex</span><span class="t t-op" data-tok="op">;</span>
     <span class="t t-fn" data-tok="fn">gap</span><span class="t t-op" data-tok="op">:</span> <span class="t t-num" data-tok="num">1</span><span class="t t-str" data-tok="str">rem</span><span class="t t-op" data-tok="op">;</span>
     <span class="t t-fn" data-tok="fn">padding</span><span class="t t-op" data-tok="op">:</span> <span class="t t-num" data-tok="num">0.75</span><span class="t t-str" data-tok="str">rem</span> <span class="t t-num" data-tok="num">1.5</span><span class="t t-str" data-tok="str">rem</span><span class="t t-op" data-tok="op">;</span>
     <span class="t t-fn" data-tok="fn">background</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">#1a1d2e</span><span class="t t-op" data-tok="op">;</span>
   <span class="t t-op" data-tok="op">}</span>
-  <span class="t t-op" data-tok="op">.</span><span class="t t-cls" data-tok="cls">nav-link</span> <span class="t t-op" data-tok="op">{</span>
+  <span class="t t-op" data-tok="op">.</span><span class="t t-csscls" data-tok="csscls">nav-link</span> <span class="t t-op" data-tok="op">{</span>
     <span class="t t-fn" data-tok="fn">color</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">#c0caf5</span><span class="t t-op" data-tok="op">;</span>
     <span class="t t-fn" data-tok="fn">text-decoration</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">none</span><span class="t t-op" data-tok="op">;</span>
     <span class="t t-fn" data-tok="fn">padding</span><span class="t t-op" data-tok="op">:</span> <span class="t t-num" data-tok="num">0.5</span><span class="t t-str" data-tok="str">rem</span> <span class="t t-num" data-tok="num">1</span><span class="t t-str" data-tok="str">rem</span><span class="t t-op" data-tok="op">;</span>
     <span class="t t-fn" data-tok="fn">border-radius</span><span class="t t-op" data-tok="op">:</span> <span class="t t-num" data-tok="num">4</span><span class="t t-str" data-tok="str">px</span><span class="t t-op" data-tok="op">;</span>
   <span class="t t-op" data-tok="op">}</span>
-  <span class="t t-op" data-tok="op">.</span><span class="t t-cls" data-tok="cls">nav-link</span><span class="t t-op" data-tok="op">.</span><span class="t t-cls" data-tok="cls">active</span> <span class="t t-op" data-tok="op">{</span>
+  <span class="t t-op" data-tok="op">.</span><span class="t t-csscls" data-tok="csscls">nav-link</span><span class="t t-op" data-tok="op">.</span><span class="t t-csscls" data-tok="csscls">active</span> <span class="t t-op" data-tok="op">{</span>
     <span class="t t-fn" data-tok="fn">color</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">#a5bcf0</span><span class="t t-op" data-tok="op">;</span>
     <span class="t t-fn" data-tok="fn">background</span><span class="t t-op" data-tok="op">:</span> <span class="t t-str" data-tok="str">rgba(165, 188, 240, 0.1)</span><span class="t t-op" data-tok="op">;</span>
   <span class="t t-op" data-tok="op">}</span>
@@ -728,8 +774,8 @@ body {
     <span class="t t-pl" data-tok="pl">u</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">email</span><span class="t t-op" data-tok="op">,</span>
     <span class="t t-fn" data-tok="fn">COUNT</span><span class="t t-op" data-tok="op">(</span><span class="t t-pl" data-tok="pl">o</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">id</span><span class="t t-op" data-tok="op">)</span> <span class="t t-kw" data-tok="kw">AS</span> <span class="t t-pl" data-tok="pl">order_count</span><span class="t t-op" data-tok="op">,</span>
     <span class="t t-fn" data-tok="fn">MAX</span><span class="t t-op" data-tok="op">(</span><span class="t t-pl" data-tok="pl">o</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">total</span><span class="t t-op" data-tok="op">)</span> <span class="t t-kw" data-tok="kw">AS</span> <span class="t t-pl" data-tok="pl">max_order</span>
-<span class="t t-kw" data-tok="kw">FROM</span> <span class="t t-pl" data-tok="pl">users</span> <span class="t t-pl" data-tok="pl">u</span>
-<span class="t t-kw" data-tok="kw">LEFT JOIN</span> <span class="t t-pl" data-tok="pl">orders</span> <span class="t t-pl" data-tok="pl">o</span> <span class="t t-kw" data-tok="kw">ON</span> <span class="t t-pl" data-tok="pl">o</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">user_id</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-pl" data-tok="pl">u</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">id</span>
+<span class="t t-kw" data-tok="kw">FROM</span> <span class="t t-cls" data-tok="cls">users</span> <span class="t t-pl" data-tok="pl">u</span>
+<span class="t t-kw" data-tok="kw">LEFT JOIN</span> <span class="t t-cls" data-tok="cls">orders</span> <span class="t t-pl" data-tok="pl">o</span> <span class="t t-kw" data-tok="kw">ON</span> <span class="t t-pl" data-tok="pl">o</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">user_id</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-pl" data-tok="pl">u</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">id</span>
 <span class="t t-kw" data-tok="kw">WHERE</span> <span class="t t-pl" data-tok="pl">u</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">created_at</span> <span class="t t-op" data-tok="op">&gt;</span> <span class="t t-str" data-tok="str">'2024-01-01'</span>
   <span class="t t-kw" data-tok="kw">AND</span> <span class="t t-pl" data-tok="pl">u</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">status</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-str" data-tok="str">'active'</span>
 <span class="t t-kw" data-tok="kw">GROUP BY</span> <span class="t t-pl" data-tok="pl">u</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">id</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pl" data-tok="pl">u</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">name</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pl" data-tok="pl">u</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">email</span>
@@ -738,7 +784,7 @@ body {
 <span class="t t-kw" data-tok="kw">LIMIT</span> <span class="t t-num" data-tok="num">20</span><span class="t t-op" data-tok="op">;</span>
 
 <span class="t t-cmt" data-tok="cmt">-- Insert with returning clause</span>
-<span class="t t-kw" data-tok="kw">INSERT INTO</span> <span class="t t-pl" data-tok="pl">audit_log</span> <span class="t t-op" data-tok="op">(</span><span class="t t-pl" data-tok="pl">user_id</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pl" data-tok="pl">action</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pl" data-tok="pl">created_at</span><span class="t t-op" data-tok="op">)</span>
+<span class="t t-kw" data-tok="kw">INSERT INTO</span> <span class="t t-cls" data-tok="cls">audit_log</span> <span class="t t-op" data-tok="op">(</span><span class="t t-pl" data-tok="pl">user_id</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pl" data-tok="pl">action</span><span class="t t-op" data-tok="op">,</span> <span class="t t-pl" data-tok="pl">created_at</span><span class="t t-op" data-tok="op">)</span>
 <span class="t t-kw" data-tok="kw">VALUES</span> <span class="t t-op" data-tok="op">(</span><span class="t t-num" data-tok="num">42</span><span class="t t-op" data-tok="op">,</span> <span class="t t-str" data-tok="str">'login'</span><span class="t t-op" data-tok="op">,</span> <span class="t t-fn" data-tok="fn">NOW</span><span class="t t-op" data-tok="op">())</span>
 <span class="t t-kw" data-tok="kw">RETURNING</span> <span class="t t-pl" data-tok="pl">id</span><span class="t t-op" data-tok="op">;</span></div>
 

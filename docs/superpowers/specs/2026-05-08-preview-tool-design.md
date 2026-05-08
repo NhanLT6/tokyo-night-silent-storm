@@ -144,6 +144,21 @@ One line per change, slot name left-padded to align arrows.
 
 ---
 
+## Typography
+
+| Context | Size |
+|---|---|
+| Code area (monospace) | 14px |
+| Sidebar section labels | 10px, uppercase |
+| Inspector slot name | 13px |
+| Inspector "Also used by" note | 11px |
+| Change row slot names / hex values | 10–11px |
+| Language tabs | 12px |
+
+UI base (sidebar, tabs, labels): 16px system font. Code line-height: 1.75.
+
+---
+
 ## File structure
 
 Single file: `preview.html`. All CSS and JS inline. No external dependencies. Opens by double-click.
