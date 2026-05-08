@@ -10,6 +10,7 @@ const PALETTE = {
   'blue-dim':       '#7494c8',
   'blue-mid':       '#8aabe6',
   'blue-bright':    '#a5bcf0',
+  'blue-whisper':   '#bccce8',
   'violet-whisper': '#c2c0e8',
   'violet-dim':     '#9480c8',
   'violet-mid':     '#c498ff',
@@ -21,15 +22,24 @@ const PALETTE = {
   'green-dim':      '#6a9e78',
   'green-mid':      '#96cc9e',
   'green-bright':   '#88dda0',
+  'green-whisper':  '#c4e4ca',
   'pink-dim':       '#b07888',
   'pink-mid':       '#e888c0',
   'pink-bright':    '#e0aabf',
+  'pink-whisper':   '#e8c2d0',
   'sand-dim':       '#a8a578',
   'sand-mid':       '#c5c28a',
   'sand-bright':    '#d4d07a',
-  'orange':         '#e09a68',
+  'sand-whisper':   '#e4e0b8',
+  'orange-dim':     '#c07848',
+  'orange-mid':     '#e09a68',
+  'orange-bright':  '#edac82',
+  'orange-whisper': '#e8d2c0',
   'plain':          '#c0caf5',
   'comment':        '#606480',
+  'inlay':          '#565f89',
+  'error':          '#e07891',
+  'warning':        '#c9a55a',
 };
 
 // ── TOKEN_SLOTS: css-class suffix → palette slot ─────────────────────────────
@@ -44,7 +54,7 @@ const TOKEN_SLOTS = {
   cst:  'teal-mid',
   ifc:  'green-mid',
   ann:  'blue-bright',
-  op:   'orange',
+  op:   'orange-mid',
   attr: 'teal-bright',
   tag:  'violet-bright',
   tp:   'violet-bright',
@@ -52,6 +62,12 @@ const TOKEN_SLOTS = {
   esc:  'blue-dim',
   pl:   'plain',
   tmpl: 'violet-dim',
+  ih:   'inlay',
+  err:  'error',
+  warn: 'warning',
+  gadd: 'green-bright',
+  gmod: 'sand-bright',
+  gdel: 'pink-bright',
 };
 
 // ── TOKEN_LABELS: css-class suffix → human label ─────────────────────────────
@@ -68,12 +84,18 @@ const TOKEN_LABELS = {
   ann:  'Annotation / Attribute',
   op:   'Operator / Punctuation',
   attr: 'HTML · JSX · Vue attribute',
-  tag:  'Tag name',
+  tag:  'HTML tag name',
   tp:   'Type parameter (C#)',
   wtp:  'Type parameter (TS)',
   esc:  'String escape',
   pl:   'Local variable / identifier',
   tmpl: 'Template variable',
+  ih:   'Inlay hint',
+  err:  'Error diagnostic',
+  warn: 'Warning diagnostic',
+  gadd: 'Git added',
+  gmod: 'Git modified',
+  gdel: 'Git deleted',
 };
 
 // ── SLOT_TOKENS: slot → list of token keys that use it ───────────────────────
@@ -106,7 +128,7 @@ function applyPalette(pal) {
 .t-cst  { color: var(--c-teal-mid); }
 .t-ifc  { color: var(--c-green-mid); }
 .t-ann  { color: var(--c-blue-bright); }
-.t-op   { color: var(--c-orange); }
+.t-op   { color: var(--c-orange-mid); }
 .t-attr { color: var(--c-teal-bright); }
 .t-tag  { color: var(--c-violet-bright); }
 .t-tp   { color: var(--c-violet-bright); }
@@ -114,6 +136,24 @@ function applyPalette(pal) {
 .t-esc  { color: var(--c-blue-dim); }
 .t-pl   { color: var(--c-plain); }
 .t-tmpl { color: var(--c-violet-dim); }
+.t-ih   { color: var(--c-inlay); font-style: italic; }
+.t-err  { color: var(--c-error); }
+.t-warn { color: var(--c-warning); }
+.t-gadd { background: var(--c-green-bright); display: inline-block; width: 3px; height: 18px; border-radius: 1px; vertical-align: middle; padding: 0; }
+.t-gmod { background: var(--c-sand-bright);  display: inline-block; width: 3px; height: 18px; border-radius: 1px; vertical-align: middle; padding: 0; }
+.t-gdel { background: var(--c-pink-bright);  display: inline-block; width: 3px; height: 18px; border-radius: 1px; vertical-align: middle; padding: 0; }
+
+/* ── IDE Features panel ──────────────────────────────────────────── */
+#panel-ide { white-space: normal; }
+#panel-ide.active { display: flex; flex-direction: column; gap: 28px; }
+.ide-block { display: flex; flex-direction: column; }
+.ide-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #414868; margin-bottom: 8px; }
+.ide-line { display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono','Fira Code','Cascadia Code',monospace; font-size: 14px; line-height: 1.75; }
+.ide-g { width: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.ide-c { white-space: pre; }
+.ide-diag { display: flex; align-items: baseline; gap: 6px; font-family: 'JetBrains Mono',monospace; font-size: 12px; padding-left: 24px; margin-top: -2px; margin-bottom: 6px; }
+.err-squiggle  { text-decoration-line: underline; text-decoration-style: wavy; text-decoration-color: var(--c-error); }
+.warn-squiggle { text-decoration-line: underline; text-decoration-style: wavy; text-decoration-color: var(--c-warning); }
 
 /* ── Layout ─────────────────────────────────────────────────────────────────── */
 body {
@@ -136,7 +176,7 @@ body {
 
 /* ── Sidebar ─────────────────────────────────────────────────────────────────── */
 .sidebar {
-  width: 252px;
+  width: 350px;
   flex-shrink: 0;
   background: #161829;
   border-right: 1px solid #2a2e48;
@@ -329,6 +369,7 @@ body {
   font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
   font-size: 14px;
   line-height: 1.75;
+  white-space: pre;
   scrollbar-width: thin;
   scrollbar-color: #2a2e48 transparent;
 }
@@ -364,63 +405,79 @@ body {
         <div class="family-row">
           <div class="family-name">blue</div>
           <div class="swatch-group">
-            <div class="swatch-col"><div class="swatch" data-slot="blue-dim"      style="background:#7494c8" onclick="selectSlot('blue-dim')"></div>      <div class="swatch-label">dim</div></div>
-            <div class="swatch-col"><div class="swatch" data-slot="blue-mid"      style="background:#8aabe6" onclick="selectSlot('blue-mid')"></div>      <div class="swatch-label">mid</div></div>
-            <div class="swatch-col"><div class="swatch" data-slot="blue-bright"   style="background:#a5bcf0" onclick="selectSlot('blue-bright')"></div>   <div class="swatch-label">brt</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="blue-dim"      style="background:#7494c8" onclick="swatchClick('blue-dim')"></div>      <div class="swatch-label">dim</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="blue-mid"      style="background:#8aabe6" onclick="swatchClick('blue-mid')"></div>      <div class="swatch-label">mid</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="blue-bright"   style="background:#a5bcf0" onclick="swatchClick('blue-bright')"></div>   <div class="swatch-label">brt</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="blue-whisper"  style="background:#bccce8" onclick="swatchClick('blue-whisper')"></div>  <div class="swatch-label">wsp</div></div>
           </div>
         </div>
 
         <div class="family-row">
           <div class="family-name">violet</div>
           <div class="swatch-group">
-            <div class="swatch-col"><div class="swatch" data-slot="violet-dim"     style="background:#9480c8" onclick="selectSlot('violet-dim')"></div>     <div class="swatch-label">dim</div></div>
-            <div class="swatch-col"><div class="swatch" data-slot="violet-mid"     style="background:#c498ff" onclick="selectSlot('violet-mid')"></div>     <div class="swatch-label">mid</div></div>
-            <div class="swatch-col"><div class="swatch" data-slot="violet-bright"  style="background:#dbbeff" onclick="selectSlot('violet-bright')"></div>  <div class="swatch-label">brt</div></div>
-            <div class="swatch-col"><div class="swatch" data-slot="violet-whisper" style="background:#c2c0e8" onclick="selectSlot('violet-whisper')"></div> <div class="swatch-label">wsp</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="violet-dim"     style="background:#9480c8" onclick="swatchClick('violet-dim')"></div>     <div class="swatch-label">dim</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="violet-mid"     style="background:#c498ff" onclick="swatchClick('violet-mid')"></div>     <div class="swatch-label">mid</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="violet-bright"  style="background:#dbbeff" onclick="swatchClick('violet-bright')"></div>  <div class="swatch-label">brt</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="violet-whisper" style="background:#c2c0e8" onclick="swatchClick('violet-whisper')"></div> <div class="swatch-label">wsp</div></div>
           </div>
         </div>
 
         <div class="family-row">
           <div class="family-name">teal</div>
           <div class="swatch-group">
-            <div class="swatch-col"><div class="swatch" data-slot="teal-dim"     style="background:#5a9e94" onclick="selectSlot('teal-dim')"></div>     <div class="swatch-label">dim</div></div>
-            <div class="swatch-col"><div class="swatch" data-slot="teal-mid"     style="background:#6ec4b6" onclick="selectSlot('teal-mid')"></div>     <div class="swatch-label">mid</div></div>
-            <div class="swatch-col"><div class="swatch" data-slot="teal-bright"  style="background:#8fd4c8" onclick="selectSlot('teal-bright')"></div>  <div class="swatch-label">brt</div></div>
-            <div class="swatch-col"><div class="swatch" data-slot="teal-whisper" style="background:#bdd8e8" onclick="selectSlot('teal-whisper')"></div> <div class="swatch-label">wsp</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="teal-dim"     style="background:#5a9e94" onclick="swatchClick('teal-dim')"></div>     <div class="swatch-label">dim</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="teal-mid"     style="background:#6ec4b6" onclick="swatchClick('teal-mid')"></div>     <div class="swatch-label">mid</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="teal-bright"  style="background:#8fd4c8" onclick="swatchClick('teal-bright')"></div>  <div class="swatch-label">brt</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="teal-whisper" style="background:#bdd8e8" onclick="swatchClick('teal-whisper')"></div> <div class="swatch-label">wsp</div></div>
           </div>
         </div>
 
         <div class="family-row">
           <div class="family-name">green</div>
           <div class="swatch-group">
-            <div class="swatch-col"><div class="swatch" data-slot="green-dim"    style="background:#6a9e78" onclick="selectSlot('green-dim')"></div>    <div class="swatch-label">dim</div></div>
-            <div class="swatch-col"><div class="swatch" data-slot="green-mid"    style="background:#96cc9e" onclick="selectSlot('green-mid')"></div>    <div class="swatch-label">mid</div></div>
-            <div class="swatch-col"><div class="swatch" data-slot="green-bright" style="background:#88dda0" onclick="selectSlot('green-bright')"></div> <div class="swatch-label">brt</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="green-dim"     style="background:#6a9e78" onclick="swatchClick('green-dim')"></div>     <div class="swatch-label">dim</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="green-mid"     style="background:#96cc9e" onclick="swatchClick('green-mid')"></div>     <div class="swatch-label">mid</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="green-bright"  style="background:#88dda0" onclick="swatchClick('green-bright')"></div>  <div class="swatch-label">brt</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="green-whisper" style="background:#c4e4ca" onclick="swatchClick('green-whisper')"></div> <div class="swatch-label">wsp</div></div>
           </div>
         </div>
 
         <div class="family-row">
           <div class="family-name">pink</div>
           <div class="swatch-group">
-            <div class="swatch-col"><div class="swatch" data-slot="pink-dim"    style="background:#b07888" onclick="selectSlot('pink-dim')"></div>    <div class="swatch-label">dim</div></div>
-            <div class="swatch-col"><div class="swatch" data-slot="pink-mid"    style="background:#e888c0" onclick="selectSlot('pink-mid')"></div>    <div class="swatch-label">mid</div></div>
-            <div class="swatch-col"><div class="swatch" data-slot="pink-bright" style="background:#e0aabf" onclick="selectSlot('pink-bright')"></div> <div class="swatch-label">brt</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="pink-dim"     style="background:#b07888" onclick="swatchClick('pink-dim')"></div>     <div class="swatch-label">dim</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="pink-mid"     style="background:#e888c0" onclick="swatchClick('pink-mid')"></div>     <div class="swatch-label">mid</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="pink-bright"  style="background:#e0aabf" onclick="swatchClick('pink-bright')"></div>  <div class="swatch-label">brt</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="pink-whisper" style="background:#e8c2d0" onclick="swatchClick('pink-whisper')"></div> <div class="swatch-label">wsp</div></div>
           </div>
         </div>
 
         <div class="family-row">
           <div class="family-name">sand</div>
           <div class="swatch-group">
-            <div class="swatch-col"><div class="swatch" data-slot="sand-dim"    style="background:#a8a578" onclick="selectSlot('sand-dim')"></div>    <div class="swatch-label">dim</div></div>
-            <div class="swatch-col"><div class="swatch" data-slot="sand-mid"    style="background:#c5c28a" onclick="selectSlot('sand-mid')"></div>    <div class="swatch-label">mid</div></div>
-            <div class="swatch-col"><div class="swatch" data-slot="sand-bright" style="background:#d4d07a" onclick="selectSlot('sand-bright')"></div> <div class="swatch-label">brt</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="sand-dim"     style="background:#a8a578" onclick="swatchClick('sand-dim')"></div>     <div class="swatch-label">dim</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="sand-mid"     style="background:#c5c28a" onclick="swatchClick('sand-mid')"></div>     <div class="swatch-label">mid</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="sand-bright"  style="background:#d4d07a" onclick="swatchClick('sand-bright')"></div>  <div class="swatch-label">brt</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="sand-whisper" style="background:#e4e0b8" onclick="swatchClick('sand-whisper')"></div> <div class="swatch-label">wsp</div></div>
           </div>
         </div>
 
         <div class="family-row">
           <div class="family-name">orange</div>
           <div class="swatch-group">
-            <div class="swatch-col"><div class="swatch" data-slot="orange" style="background:#e09a68" onclick="selectSlot('orange')"></div> <div class="swatch-label">—</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="orange-dim"     style="background:#c07848" onclick="swatchClick('orange-dim')"></div>     <div class="swatch-label">dim</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="orange-mid"     style="background:#e09a68" onclick="swatchClick('orange-mid')"></div>     <div class="swatch-label">mid</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="orange-bright"  style="background:#edac82" onclick="swatchClick('orange-bright')"></div>  <div class="swatch-label">brt</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="orange-whisper" style="background:#e8d2c0" onclick="swatchClick('orange-whisper')"></div> <div class="swatch-label">wsp</div></div>
+          </div>
+        </div>
+
+        <div class="family-row">
+          <div class="family-name" style="width:46px">diag</div>
+          <div class="swatch-group">
+            <div class="swatch-col"><div class="swatch" data-slot="error"   style="background:#e07891" onclick="swatchClick('error')"></div>   <div class="swatch-label">err</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="warning" style="background:#c9a55a" onclick="swatchClick('warning')"></div> <div class="swatch-label">wrn</div></div>
+            <div class="swatch-col"><div class="swatch" data-slot="inlay"   style="background:#565f89" onclick="swatchClick('inlay')"></div>   <div class="swatch-label">inh</div></div>
           </div>
         </div>
       </div>
@@ -463,12 +520,17 @@ body {
       <div class="tab" data-lang="html">HTML / CSS</div>
       <div class="tab" data-lang="json">JSON</div>
       <div class="tab" data-lang="sql">SQL</div>
+      <div class="tab" data-lang="ide">IDE</div>
     </div>
 
     <div class="code-panels">
 
       <!-- C# ─────────────────────────────────────────────────────────────── -->
-      <div class="code-panel active" id="panel-cs"><span class="t t-ann" data-tok="ann">[<span class="t t-ann" data-tok="ann">Route</span>(<span class="t t-str" data-tok="str">"api/users"</span>)]</span>
+      <div class="code-panel active" id="panel-cs"><span class="t t-kw" data-tok="kw">namespace</span> <span class="t t-cls" data-tok="cls">MyApp</span><span class="t t-op" data-tok="op">.</span><span class="t t-cls" data-tok="cls">Controllers</span><span class="t t-op" data-tok="op">;</span>
+
+<span class="t t-kw" data-tok="kw">using</span> <span class="t t-cls" data-tok="cls">Microsoft</span><span class="t t-op" data-tok="op">.</span><span class="t t-cls" data-tok="cls">AspNetCore</span><span class="t t-op" data-tok="op">.</span><span class="t t-cls" data-tok="cls">Mvc</span><span class="t t-op" data-tok="op">;</span>
+
+<span class="t t-ann" data-tok="ann">[<span class="t t-ann" data-tok="ann">Route</span>(<span class="t t-str" data-tok="str">"api/users"</span>)]</span>
 <span class="t t-ann" data-tok="ann">[<span class="t t-ann" data-tok="ann">ApiController</span>]</span>
 <span class="t t-kw" data-tok="kw">public class</span> <span class="t t-cls" data-tok="cls">UserController</span> <span class="t t-op" data-tok="op">:</span> <span class="t t-cls" data-tok="cls">ControllerBase</span>
 <span class="t t-op" data-tok="op">{</span>
@@ -557,11 +619,11 @@ body {
     <span class="t t-fn" data-tok="fn">fetchUser</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">userId</span><span class="t t-op" data-tok="op">).</span><span class="t t-fn" data-tok="fn">then</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">u</span> <span class="t t-op" data-tok="op">=&gt;</span> <span class="t t-op" data-tok="op">{</span> <span class="t t-fn" data-tok="fn">setUser</span><span class="t t-op" data-tok="op">(</span><span class="t t-pm" data-tok="pm">u</span><span class="t t-op" data-tok="op">);</span> <span class="t t-fn" data-tok="fn">setLoading</span><span class="t t-op" data-tok="op">(</span><span class="t t-kw" data-tok="kw">false</span><span class="t t-op" data-tok="op">);</span> <span class="t t-op" data-tok="op">});</span>
   <span class="t t-op" data-tok="op">},</span> <span class="t t-op" data-tok="op">[</span><span class="t t-pm" data-tok="pm">userId</span><span class="t t-op" data-tok="op">]);</span>
 
-  <span class="t t-kw" data-tok="kw">if</span> <span class="t t-op" data-tok="op">(</span><span class="t t-pl" data-tok="pl">loading</span><span class="t t-op" data-tok="op">)</span> <span class="t t-kw" data-tok="kw">return</span> <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">Spinner</span> <span class="t t-attr" data-tok="attr">size</span><span class="t t-op" data-tok="op">={</span><span class="t t-num" data-tok="num">24</span><span class="t t-op" data-tok="op">} /&gt;;</span>
+  <span class="t t-kw" data-tok="kw">if</span> <span class="t t-op" data-tok="op">(</span><span class="t t-pl" data-tok="pl">loading</span><span class="t t-op" data-tok="op">)</span> <span class="t t-kw" data-tok="kw">return</span> <span class="t t-op" data-tok="op">&lt;</span><span class="t t-cls" data-tok="cls">Spinner</span> <span class="t t-attr" data-tok="attr">size</span><span class="t t-op" data-tok="op">={</span><span class="t t-num" data-tok="num">24</span><span class="t t-op" data-tok="op">} /&gt;;</span>
 
   <span class="t t-kw" data-tok="kw">return</span> <span class="t t-op" data-tok="op">(</span>
     <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">div</span> <span class="t t-attr" data-tok="attr">className</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"user-card"</span><span class="t t-op" data-tok="op">&gt;</span>
-      <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">Avatar</span> <span class="t t-attr" data-tok="attr">userId</span><span class="t t-op" data-tok="op">={</span><span class="t t-pm" data-tok="pm">userId</span><span class="t t-op" data-tok="op">}</span> <span class="t t-attr" data-tok="attr">size</span><span class="t t-op" data-tok="op">={</span><span class="t t-num" data-tok="num">48</span><span class="t t-op" data-tok="op">}</span> <span class="t t-attr" data-tok="attr">alt</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"avatar"</span> <span class="t t-op" data-tok="op">/&gt;</span>
+      <span class="t t-op" data-tok="op">&lt;</span><span class="t t-cls" data-tok="cls">Avatar</span> <span class="t t-attr" data-tok="attr">userId</span><span class="t t-op" data-tok="op">={</span><span class="t t-pm" data-tok="pm">userId</span><span class="t t-op" data-tok="op">}</span> <span class="t t-attr" data-tok="attr">size</span><span class="t t-op" data-tok="op">={</span><span class="t t-num" data-tok="num">48</span><span class="t t-op" data-tok="op">}</span> <span class="t t-attr" data-tok="attr">alt</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"avatar"</span> <span class="t t-op" data-tok="op">/&gt;</span>
       <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">h2</span> <span class="t t-attr" data-tok="attr">className</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"user-name"</span><span class="t t-op" data-tok="op">&gt;{</span><span class="t t-pl" data-tok="pl">user</span><span class="t t-op" data-tok="op">?.</span><span class="t t-pl" data-tok="pl">name</span><span class="t t-op" data-tok="op">}&lt;/</span><span class="t t-tag" data-tok="tag">h2</span><span class="t t-op" data-tok="op">&gt;</span>
       <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">button</span>
         <span class="t t-attr" data-tok="attr">onClick</span><span class="t t-op" data-tok="op">={() =&gt;</span> <span class="t t-pl" data-tok="pl">user</span> <span class="t t-op" data-tok="op">&amp;&amp;</span> <span class="t t-fn" data-tok="fn">onSelect</span><span class="t t-op" data-tok="op">(</span><span class="t t-pl" data-tok="pl">user</span><span class="t t-op" data-tok="op">)}</span>
@@ -578,7 +640,7 @@ body {
       <!-- Vue ─────────────────────────────────────────────────────────────── -->
       <div class="code-panel" id="panel-vue"><span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">template</span><span class="t t-op" data-tok="op">&gt;</span>
   <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">div</span> <span class="t t-attr" data-tok="attr">class</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"user-list"</span><span class="t t-op" data-tok="op">&gt;</span>
-    <span class="t t-op" data-tok="op">&lt;</span><span class="t t-tag" data-tok="tag">UserCard</span>
+    <span class="t t-op" data-tok="op">&lt;</span><span class="t t-cls" data-tok="cls">UserCard</span>
       <span class="t t-attr" data-tok="attr">v-for</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"user in users"</span>
       <span class="t t-attr" data-tok="attr">:key</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"user.id"</span>
       <span class="t t-attr" data-tok="attr">:user</span><span class="t t-op" data-tok="op">=</span><span class="t t-str" data-tok="str">"user"</span>
@@ -599,7 +661,7 @@ body {
 <span class="t t-kw" data-tok="kw">const</span> <span class="t t-pl" data-tok="pl">users</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-fn" data-tok="fn">ref</span><span class="t t-op" data-tok="op">&lt;</span><span class="t t-cls" data-tok="cls">User</span><span class="t t-op" data-tok="op">[]&gt;([])</span>
 <span class="t t-kw" data-tok="kw">const</span> <span class="t t-pl" data-tok="pl">total</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-fn" data-tok="fn">computed</span><span class="t t-op" data-tok="op">(()</span> <span class="t t-op" data-tok="op">=&gt;</span> <span class="t t-pl" data-tok="pl">users</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">value</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">length</span><span class="t t-op" data-tok="op">)</span>
 
-<span class="t t-fn" data-tok="fn">onMounted</span><span class="t t-op" data-tok="op">(async () =&gt; {</span>
+<span class="t t-fn" data-tok="fn">onMounted</span><span class="t t-op" data-tok="op">(</span><span class="t t-kw" data-tok="kw">async</span> <span class="t t-op" data-tok="op">() =&gt; {</span>
   <span class="t t-pl" data-tok="pl">users</span><span class="t t-op" data-tok="op">.</span><span class="t t-pl" data-tok="pl">value</span> <span class="t t-op" data-tok="op">=</span> <span class="t t-kw" data-tok="kw">await</span> <span class="t t-fn" data-tok="fn">fetchUsers</span><span class="t t-op" data-tok="op">()</span>
 <span class="t t-op" data-tok="op">})</span>
 
@@ -680,6 +742,67 @@ body {
 <span class="t t-kw" data-tok="kw">VALUES</span> <span class="t t-op" data-tok="op">(</span><span class="t t-num" data-tok="num">42</span><span class="t t-op" data-tok="op">,</span> <span class="t t-str" data-tok="str">'login'</span><span class="t t-op" data-tok="op">,</span> <span class="t t-fn" data-tok="fn">NOW</span><span class="t t-op" data-tok="op">())</span>
 <span class="t t-kw" data-tok="kw">RETURNING</span> <span class="t t-pl" data-tok="pl">id</span><span class="t t-op" data-tok="op">;</span></div>
 
+      <!-- IDE Features ─────────────────────────────────────────────── -->
+      <div class="code-panel" id="panel-ide">
+
+        <div class="ide-block">
+          <div class="ide-label">Inlay hints</div>
+          <div class="ide-line">
+            <div class="ide-g"></div>
+            <div class="ide-c"><span class="t t-kw" data-tok="kw">const</span> user<span class="t t-ih" data-tok="ih">: User</span> = <span class="t t-fn" data-tok="fn">getUser</span>(<span class="t t-ih" data-tok="ih">id:</span> <span class="t t-num" data-tok="num">42</span>);</div>
+          </div>
+          <div class="ide-line">
+            <div class="ide-g"></div>
+            <div class="ide-c"><span class="t t-kw" data-tok="kw">const</span> [count<span class="t t-ih" data-tok="ih">: number</span>, <span class="t t-fn" data-tok="fn">setCount</span><span class="t t-ih" data-tok="ih">: Dispatch</span>] = <span class="t t-fn" data-tok="fn">useState</span>(<span class="t t-num" data-tok="num">0</span>);</div>
+          </div>
+          <div class="ide-line">
+            <div class="ide-g"></div>
+            <div class="ide-c"><span class="t t-fn" data-tok="fn">fetchUser</span>(<span class="t t-ih" data-tok="ih">id:</span> <span class="t t-pl" data-tok="pl">userId</span>, <span class="t t-ih" data-tok="ih">opts:</span> <span class="t t-kw" data-tok="kw">undefined</span>);</div>
+          </div>
+        </div>
+
+        <div class="ide-block">
+          <div class="ide-label">Git gutter</div>
+          <div class="ide-line">
+            <div class="ide-g"><span class="t t-gadd" data-tok="gadd"></span></div>
+            <div class="ide-c"><span class="t t-kw" data-tok="kw">const</span> <span class="t t-pl" data-tok="pl">newFeature</span> = <span class="t t-kw" data-tok="kw">true</span>;    <span class="t t-cmt" data-tok="cmt">// added</span></div>
+          </div>
+          <div class="ide-line">
+            <div class="ide-g"><span class="t t-gmod" data-tok="gmod"></span></div>
+            <div class="ide-c"><span class="t t-kw" data-tok="kw">const</span> <span class="t t-pl" data-tok="pl">version</span> = <span class="t t-str" data-tok="str">"2.0.0"</span>;  <span class="t t-cmt" data-tok="cmt">// modified</span></div>
+          </div>
+          <div class="ide-line">
+            <div class="ide-g"><span class="t t-gdel" data-tok="gdel"></span></div>
+            <div class="ide-c"><span class="t t-cmt" data-tok="cmt">// const version = "1.0.0";  deleted</span></div>
+          </div>
+          <div class="ide-line">
+            <div class="ide-g"></div>
+            <div class="ide-c"><span class="t t-kw" data-tok="kw">export</span> { <span class="t t-pl" data-tok="pl">newFeature</span>, <span class="t t-pl" data-tok="pl">version</span> };</div>
+          </div>
+        </div>
+
+        <div class="ide-block">
+          <div class="ide-label">Diagnostics</div>
+          <div class="ide-line">
+            <div class="ide-g"></div>
+            <div class="ide-c"><span class="t t-kw" data-tok="kw">const</span> <span class="t t-pl" data-tok="pl">x</span> = <span class="err-squiggle"><span class="t t-fn" data-tok="fn">fetchData</span></span>();</div>
+          </div>
+          <div class="ide-diag">
+            <span class="t t-err" data-tok="err">◆</span>
+            <span class="t t-err" data-tok="err">Cannot find name 'fetchData'.</span>
+          </div>
+          <div class="ide-line" style="margin-top:8px">
+            <div class="ide-g"></div>
+            <div class="ide-c"><span class="t t-kw" data-tok="kw">const</span> <span class="t t-pl" data-tok="pl">n</span> = <span class="warn-squiggle"><span class="t t-fn" data-tok="fn">parseInt</span>(<span class="t t-str" data-tok="str">"abc"</span>)</span>;</div>
+          </div>
+          <div class="ide-diag">
+            <span class="t t-warn" data-tok="warn">⚠</span>
+            <span class="t t-warn" data-tok="warn">Result may be NaN — validate input before parsing.</span>
+          </div>
+        </div>
+
+      </div>
+
     </div><!-- /code-panels -->
   </main>
 
@@ -701,6 +824,11 @@ function hexOf(slot) { return curPalette[slot] || PALETTE[slot] || '#000000'; }
 function isValidHex(v) { return /^#[0-9a-fA-F]{6}$/.test(v); }
 
 // ── Inspector ─────────────────────────────────────────────────────────────────
+function swatchClick(slot) {
+  navigator.clipboard.writeText(hexOf(slot)).catch(() => {});
+  selectSlot(slot);
+}
+
 function selectSlot(slot, tokKey) {
   curSlot   = slot;
   curTokKey = tokKey || null;
