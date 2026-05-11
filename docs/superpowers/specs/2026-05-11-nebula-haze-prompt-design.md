@@ -66,10 +66,17 @@ Depth rationale: most chars are far/mid; one `⊹` is the single brightest point
 
 Segment type: `shell`
 
-| Shell | Glyph | NF name | Color | Hex |
-|-------|-------|---------|-------|-----|
-| PowerShell | `󰨊` | `nf-md-powershell` | teal-mid | `#6ec4b6` |
-| Bash / Fedora | `󰣛` | `nf-md-fedora` | green-mid | `#96cc9e` |
+All shells share the same color (`#6ec4b6`, teal-mid).
+
+| Shell | Glyph | NF name |
+|-------|-------|---------|
+| `pwsh` / `powershell` | `󰨊` | `nf-md-powershell` |
+| `bash` | `󱆃` | `nf-md-bash` |
+| `zsh` | `󱆃` | `nf-md-bash` (no dedicated zsh glyph) |
+| `fish` | `󱐋` | `nf-md-fish` |
+| `cmd` | `󰖳` | `nf-md-windows` |
+| `nu` (Nushell) | `󰬦` | `nf-md-nushell` |
+| anything else | `󰣛` | `nf-md-fedora` (Linux/unknown fallback) |
 
 ---
 
@@ -77,11 +84,14 @@ Segment type: `shell`
 
 Segment type: `path`
 
-- **Style:** `agnoster_full` (full path from git root when inside a repo)
-- **Folder separator:** `/`
-- **Truncation:** when path depth > 3 folders from root, show `root/…/current`
-- **Max depth:** 4 segments before truncating
-- **Note:** Exact oh-my-posh style name should be verified against current docs during implementation — `agnoster_full` or a custom template may be needed
+- **Style:** `agnoster_short` — shows the last `max_depth` folder names; when deeper, a single `folder_icon` (`…`) replaces all truncated ancestors
+- **Max depth:** 4 — renders up to 4 folders before the `…` prefix appears; example: `E:/…/ProjectRoot/src/Components/Button`
+- **Folder separator:** `/` (dim `#606480` via `folder_separator_template`)
+- **Truncation icon:** `…` (set via `folder_icon` property)
+- **Config key:** `options` (oh-my-posh path segment uses `options`, not `properties`)
+
+> `agnoster_full` was considered but rejected — it has no truncation support and always renders the complete path.
+> A git-root-relative style (`../ProjectRoot/sub/path`) is not natively available in oh-my-posh.
 
 **Color rules:**
 
@@ -108,12 +118,13 @@ Segment type: `git`
 
 | Property | Value |
 |----------|-------|
-| Branch icon | `󰘬` (`nf-md-source_branch`) |
+| Branch icon | `󰘬` (`nf-md-source_branch`) — rendered manually in template |
 | Icon color | `#7494c8` (blue-dim) |
 | Branch name color | `#8aabe6` (blue-mid) |
 | Max length | 20 characters |
 | Truncation suffix | `…` |
 | Show only | branch name — no dirty/ahead/behind indicators |
+| `branch_icon` property | `""` (empty) — oh-my-posh prepends `BranchIcon` to `.HEAD`; setting empty prevents duplicate icon |
 
 **Visibility condition — hidden when either env var is set:**
 
@@ -161,8 +172,7 @@ All values are hardcoded in the oh-my-posh JSON. No runtime dependency on `nebul
 | Token | Hex | Source |
 |-------|-----|--------|
 | `#21243a` | Background | Nebula Haze base |
-| `#6ec4b6` | PowerShell icon | teal-mid |
-| `#96cc9e` | Fedora icon | green-mid |
+| `#6ec4b6` | Shell icon (all shells) | teal-mid |
 | `#c0caf5` | Path text | plain text |
 | `#606480` | Path separators, mid scatter | comments |
 | `#414868` | Far scatter | chrome-mid |

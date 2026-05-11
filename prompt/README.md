@@ -43,7 +43,7 @@ Git branch is automatically hidden inside **Rider** and **VS Code** terminals �
 ## Features
 
 - 3-line layout: scatter divider → info line → connector
-- Shell icon: `󰨊` PowerShell · `󰣛` Fedora/bash
+- Shell icon: `󰨊` PowerShell · `󱆃` Bash/Zsh · `󱐋` Fish · `󰖳` Cmd · `󰬦` Nushell · `󰣛` other
 - Full path from git root, truncated when deep
 - Branch name truncated to 20 chars
 - `╰❯` turns red with exit code on failure
