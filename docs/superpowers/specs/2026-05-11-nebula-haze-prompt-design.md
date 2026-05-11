@@ -177,7 +177,9 @@ All values are hardcoded in the oh-my-posh JSON. No runtime dependency on `nebul
 
 ## Files to create
 
+All prompt files live under `prompt/` — separate from the JetBrains/Rider theme at the project root.
+
 | File | Purpose |
 |------|---------|
-| `nebula-haze.omp.json` | oh-my-posh theme config (project root) |
-| `README-prompt.md` | Install instructions (font, oh-my-posh, shell profile setup) |
+| `prompt/nebula-haze.omp.json` | oh-my-posh theme config |
+| `prompt/README.md` | Install instructions (font, oh-my-posh, shell profile setup) |
