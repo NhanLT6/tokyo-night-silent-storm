@@ -77,10 +77,11 @@ Segment type: `shell`
 
 Segment type: `path`
 
-- **Style:** `agnoster_left` (full path from git root when inside a repo)
+- **Style:** `agnoster_full` (full path from git root when inside a repo)
 - **Folder separator:** `/`
 - **Truncation:** when path depth > 3 folders from root, show `root/…/current`
 - **Max depth:** 4 segments before truncating
+- **Note:** Exact oh-my-posh style name should be verified against current docs during implementation — `agnoster_full` or a custom template may be needed
 
 **Color rules:**
 
@@ -147,7 +148,7 @@ The exit code display disappears on the next successful command.
 
 | Feature | Config |
 |---------|--------|
-| Transient prompt | Enabled — full prompt collapses to bare `╰❯` in scrollback |
+| Transient prompt | Enabled — full prompt collapses to bare `╰❯` in scrollback; collapsed `╰❯` uses dim color `#414868` (not violet) |
 | Blank line before prompt | Replaced by galaxy scatter divider |
 | Execution time | Disabled |
 
