@@ -1,0 +1,80 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "version": 2,
+  "final_space": true,
+  "transient_prompt": {
+    "background": "transparent",
+    "foreground": "#414868",
+    "template": "╰❯ "
+  },
+  "blocks": [
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "type": "text",
+          "style": "plain",
+          "background": "transparent",
+          "foreground": "transparent",
+          "template": "<#606480>⋆</><#9480c8>·</><#414868>-</> <#414868>⋅</> <#c2c0e8>⊹</> <#606480>·</> <#414868>⋆</> <#606480>-</> <#414868>·</> <#9480c8>+</> <#9480c8>·</><#414868>·</> <#606480>-</>"
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "type": "shell",
+          "style": "plain",
+          "background": "transparent",
+          "foreground": "#6ec4b6",
+          "template": "{{ if or (eq .Name \"pwsh\") (eq .Name \"powershell\") }}󰨊 {{ else }}󰣛 {{ end }}"
+        },
+        {
+          "type": "path",
+          "style": "plain",
+          "background": "transparent",
+          "foreground": "#c0caf5",
+          "properties": {
+            "style": "agnoster_full",
+            "folder_separator_icon": "/",
+            "folder_separator_template": "<#606480>/</>",
+            "max_depth": 4,
+            "truncation_symbol": "…"
+          }
+        },
+        {
+          "type": "git",
+          "style": "plain",
+          "background": "transparent",
+          "foreground": "#8aabe6",
+          "template": "{{ if and (ne .Env.TERMINAL_EMULATOR \"JetBrains-JediTerm\") (ne .Env.TERM_PROGRAM \"vscode\") }} <#606480>·</> <#7494c8>󰘬 </>{{ if gt (len .HEAD) 20 }}{{ trunc 20 .HEAD }}…{{ else }}{{ .HEAD }}{{ end }}{{ end }}",
+          "properties": {
+            "fetch_status": false,
+            "fetch_upstream_icon": false
+          }
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "type": "exit",
+          "style": "plain",
+          "background": "transparent",
+          "foreground": "#9480c8",
+          "template": "{{ if gt .Code 0 }}<#e07891>╰❯ 󰅚 {{ .Code }}</>{{ else }}╰❯{{ end }}",
+          "properties": {
+            "always_enabled": true
+          }
+        }
+      ]
+    }
+  ]
+}
