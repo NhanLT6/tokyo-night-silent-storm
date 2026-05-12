@@ -31,7 +31,7 @@
           "style": "plain",
           "background": "transparent",
           "foreground": "#6ec4b6",
-          "template": "{{ if or (eq .Name \"pwsh\") (eq .Name \"powershell\") }}󰨊 {{ else if eq .Name \"bash\" }}󱆃 {{ else if eq .Name \"zsh\" }}󱆃 {{ else if eq .Name \"fish\" }}󱐋 {{ else if eq .Name \"cmd\" }}󰖳 {{ else if eq .Name \"nu\" }}󰬦 {{ else }}󰣛 {{ end }}"
+          "template": "󱃅"
         },
         {
           "type": "path",
