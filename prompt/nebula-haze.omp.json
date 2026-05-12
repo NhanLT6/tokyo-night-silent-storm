@@ -52,7 +52,7 @@
           "background": "transparent",
           "foreground": "#8aabe6",
           "template": "{{ if and (ne .Env.TERMINAL_EMULATOR \"JetBrains-JediTerm\") (ne .Env.TERM_PROGRAM \"vscode\") }} <#606480>·</> <#7494c8>󰘬 </>{{ if gt (len .HEAD) 20 }}{{ trunc 20 .HEAD }}…{{ else }}{{ .HEAD }}{{ end }}{{ end }}",
-          "properties": {
+          "options": {
             "fetch_status": false,
             "fetch_upstream_icon": false,
             "branch_icon": ""
@@ -66,12 +66,12 @@
       "newline": true,
       "segments": [
         {
-          "type": "exit",
+          "type": "status",
           "style": "plain",
           "background": "transparent",
           "foreground": "#9480c8",
-          "template": "{{ if gt .Code 0 }}<#e07891>╰❯ 󰅚 {{ .Code }}</>{{ else }}╰❯{{ end }}",
-          "properties": {
+          "template": "{{ if gt .Code 0 }}<#e07891>󰅚 {{ .Code }}</>{{ else }}╰❯{{ end }}",
+          "options": {
             "always_enabled": true
           }
         }
